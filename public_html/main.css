@@ -1,0 +1,54 @@
+html {
+
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.2;
+}
+
+.app {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.header .logo {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0 20px;
+}
+
+.clock {
+  padding: 15px;
+  border: 1px solid #dda531;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.coin {
+  padding: 15px;
+  border: 1px solid #6560dd;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.coin .info {
+  display: flex;
+  justify-content: space-between;
+}
+.coin h1 {
+  margin: 0 0 15px 0;
+  line-height: 1;
+}
+
+.coin p {
+  margin: 0;
+}
