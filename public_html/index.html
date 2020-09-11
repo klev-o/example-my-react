@@ -7,32 +7,87 @@
   <title>Demo Crypto</title>
 </head>
 <body>
-  <div class="app">
 
-    <header class="header">
-      <img class="logo" src="logo.png" alt="crypto">
-      <h1>Burse</h1>
-    </header>
+  <div id="root"></div>
 
-    <div class="clock">13:18:56</div>
+  <script>
 
-    <div class="coins">
-      <div class="coin">
-        <h2>Super Coin</h2>
-        <div class="info">
-          <p>Super coin for you</p>
-          <div class="price">256.36</div>
-        </div>
-      </div>
-      <div class="coin">
-        <h2>Awesome Coin AWM</h2>
-        <div class="info">
-          <p>Cosmic coin. Available in ru zone</p>
-          <div class="price">1025.32</div>
-        </div>
-      </div>
-    </div>
+    //=======================
 
-  </div>
+    const state = {
+        time: new Date(),
+        coins: [
+            {
+                id: 1,
+                name: 'Super Coin',
+                description: 'Super coin for you',
+                price: 256.36,
+            },
+            {
+                id: 2,
+                name: 'Awesome Coin AWM',
+                description: 'Cosmic coin. Available in ru zone',
+                price: 1025.32,
+            },
+        ]
+    }
+
+    //=======================
+
+    const app = document.createElement('div')
+    app.className = 'app'
+
+    const header = document.createElement('header')
+    header.className = 'header'
+
+    const logo = document.createElement('img')
+    logo.className = 'logo'
+    logo.src = 'logo.png'
+    header.append(logo)
+
+    app.append(header)
+
+    const clock = document.createElement('div')
+    clock.className = 'clock'
+    clock.innerText = state.time.toLocaleString()
+
+    app.append(clock)
+
+    const coins = document.createElement('div')
+    coins.className = 'coins'
+
+    state.coins.forEach((coin) => {
+      const node = document.createElement('div')
+      node.className = 'coin'
+
+      const name = document.createElement('h2')
+      name.innerText = coin.name
+      node.append(name)
+
+      const info = document.createElement('div')
+      info.className = 'info'
+
+      const description = document.createElement('p')
+      description.innerText = coin.description
+      info.append(description)
+
+      const price = document.createElement('div')
+      price.className = 'price'
+      price.innerText = coin.price
+      info.append(price)
+
+      node.append(info)
+
+      coins.append(node)
+    })
+
+    app.append(coins)
+
+    //=======================
+
+    const domRoot = document.getElementById('root')
+    domRoot.append(app)
+
+  </script>
 </body>
 </html>
