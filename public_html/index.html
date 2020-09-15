@@ -134,11 +134,11 @@
             time: new Date()
         }
 
-        const newApp = App({ state })
+        render(
+            App({ state }),
+            document.getElementById('root')
+        )
 
-        const root = document.getElementById('root')
-        root.innerHTML = ''
-        root.append(newApp)
     }, 1000)
 
     //=======================
