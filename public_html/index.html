@@ -34,59 +34,81 @@
 
     //=======================
 
-    const app = document.createElement('div')
-    app.className = 'app'
+    function App({ state }) {
+        const node = document.createElement('div')
+        node.className = 'app'
 
-    const header = document.createElement('header')
-    header.className = 'header'
+        node.append(Header())
+        node.append(Clock({ time: state.time }))
+        node.append(Coins({ coins: state.coins }))
 
-    const logo = document.createElement('img')
-    logo.className = 'logo'
-    logo.src = 'logo.png'
-    header.append(logo)
+        return node
+    }
 
-    app.append(header)
+    function Header() {
+        const node = document.createElement('header')
+        node.className = 'header'
 
-    const clock = document.createElement('div')
-    clock.className = 'clock'
-    clock.innerText = state.time.toLocaleString()
+        node.append(Logo())
+        return node
+    }
 
-    app.append(clock)
+    function Logo() {
+        const node = document.createElement('img')
+        node.className = 'logo'
+        node.src = 'logo.png'
+        return node
+    }
 
-    const coins = document.createElement('div')
-    coins.className = 'coins'
+    function Clock({ time }) {
+        const node = document.createElement('div')
+        node.className = 'clock'
+        node.innerText = time.toLocaleString()
+        return node
+    }
 
-    state.coins.forEach((coin) => {
-      const node = document.createElement('div')
-      node.className = 'coin'
+    function Coins({ coins }) {
+        const node = document.createElement('div')
+        node.className = 'coins'
 
-      const name = document.createElement('h2')
-      name.innerText = coin.name
-      node.append(name)
+        coins.forEach((coin) => {
+            node.append(Coin({ coin }))
+        })
 
-      const info = document.createElement('div')
-      info.className = 'info'
+        return node
+    }
 
-      const description = document.createElement('p')
-      description.innerText = coin.description
-      info.append(description)
+    function Coin({ coin }) {
+        const node = document.createElement('div')
+        node.className = 'coin'
 
-      const price = document.createElement('div')
-      price.className = 'price'
-      price.innerText = coin.price
-      info.append(price)
+        const name = document.createElement('h2')
+        name.innerText = coin.name
+        node.append(name)
 
-      node.append(info)
+        const info = document.createElement('div')
+        info.className = 'info'
 
-      coins.append(node)
-    })
+        const description = document.createElement('p')
+        description.innerText = coin.description
+        info.append(description)
 
-    app.append(coins)
+        const price = document.createElement('div')
+        price.className = 'price'
+        price.innerText = coin.price
+        info.append(price)
+
+        node.append(info)
+
+        return node
+    }
 
     //=======================
 
-    const domRoot = document.getElementById('root')
-    domRoot.append(app)
+    const newDom = App({ state })
+    const realDomRoot = document.getElementById('root')
+
+    realDomRoot.append(newDom)
 
   </script>
 </body>
