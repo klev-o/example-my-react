@@ -28,9 +28,31 @@ body {
 
 .clock {
   padding: 15px;
-  border: 1px solid #dda531;
+  border: 1px solid #efda13;
   border-radius: 5px;
   margin-bottom: 10px;
+}
+
+.clock .value {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 15px;
+}
+
+.clock .icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+  border-radius: 15px;
+}
+
+.clock .icon.day {
+  background-color: #efda13;
+}
+
+.clock .icon.night {
+  background-color: #400ea7;
 }
 
 .coin {
