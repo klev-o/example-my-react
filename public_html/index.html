@@ -179,6 +179,19 @@
             coins
         }
         renderView(state)
+
+        setInterval(() => {
+            state = {
+                ...state,
+                coins: state.coins.map((coin) => {
+                    return {
+                        ...coin,
+                        price: Math.round((Math.random() * 10 + 40))
+                    }
+                })
+            }
+            renderView(state)
+        }, 500)
     })
 
     //=======================
