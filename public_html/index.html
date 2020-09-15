@@ -40,6 +40,20 @@
         }
     }
 
+    const stream = {
+        subscribe (channel, listener) {
+            const match = /price-(\d+)/.exec(channel)
+            if (match) {
+                setInterval(() => {
+                    listener({
+                        id: parseInt(match[1]),
+                        price: Math.round((Math.random() * 10 + 40))
+                    })
+                }, 500)
+            }
+        }
+    }
+
     //=======================
 
     let state = {
@@ -180,18 +194,25 @@
         }
         renderView(state)
 
-        setInterval(() => {
+        const onPrice = (data) => {
             state = {
                 ...state,
                 coins: state.coins.map((coin) => {
-                    return {
-                        ...coin,
-                        price: Math.round((Math.random() * 10 + 40))
+                    if (coin.id === data.id) {
+                        return {
+                            ...coin,
+                            price: data.price
+                        }
                     }
+                    return coin
                 })
             }
-            renderView(state)
-        }, 500)
+        renderView(state)
+      }
+
+      coins.forEach((coin) => {
+          stream.subscribe(`price-${coin.id}`, onPrice)
+      })
     })
 
     //=======================
