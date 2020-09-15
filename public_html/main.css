@@ -74,3 +74,10 @@ body {
 .coin p {
   margin: 0;
 }
+
+.loading {
+  padding: 10px;
+  border-radius: 6px;
+  background: #eee;
+  text-align: center;
+}

@@ -12,24 +12,39 @@
 
   <script>
 
+    const api = {
+        get (url) {
+            switch (url) {
+                case '/coins':
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve([
+                                {
+                                    id: 1,
+                                    name: 'Super Coin',
+                                    description: 'Super coin for you',
+                                    price: 256.36,
+                                },
+                                {
+                                    id: 2,
+                                    name: 'Awesome Coin AWM',
+                                    description: 'Cosmic coin. Available in ru zone',
+                                    price: 1025.32,
+                                },
+                            ])
+                        }, 1000)
+                    })
+                default:
+                    throw new Error('Unknown address')
+            }
+        }
+    }
+
     //=======================
 
     let state = {
         time: new Date(),
-        coins: [
-            {
-                id: 1,
-                name: 'Super Coin',
-                description: 'Super coin for you',
-                price: 256.36,
-            },
-            {
-                id: 2,
-                name: 'Awesome Coin AWM',
-                description: 'Cosmic coin. Available in ru zone',
-                price: 1025.32,
-            },
-        ]
+        coins: null
     }
 
     //=======================
@@ -83,7 +98,18 @@
         return node
     }
 
+    function Loading () {
+        const node = document.createElement('div')
+        node.className = 'loading'
+        node.innerText = 'Loading...'
+        return node
+    }
+
     function Coins({ coins }) {
+        if (coins === null) {
+            return Loading()
+        }
+
         const node = document.createElement('div')
         node.className = 'coins'
 
@@ -146,6 +172,14 @@
         renderView(state)
 
     }, 1000)
+
+    api.get('/coins').then((coins) => {
+        state = {
+            ...state,
+            coins
+        }
+        renderView(state)
+    })
 
     //=======================
 
