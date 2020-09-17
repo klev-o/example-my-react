@@ -8,12 +8,12 @@
 </head>
 <body>
 
-  <div id="root"></div>
+<div id="root"></div>
 
-  <script>
+<script>
 
     const api = {
-        get (url) {
+        get(url) {
             switch (url) {
                 case '/coins':
                     return new Promise((resolve) => {
@@ -41,7 +41,7 @@
     }
 
     const stream = {
-        subscribe (channel, listener) {
+        subscribe(channel, listener) {
             const match = /price-(\d+)/.exec(channel)
             if (match) {
                 setInterval(() => {
@@ -63,101 +63,158 @@
 
     //=======================
 
-    function App({ state }) {
-        const node = document.createElement('div')
-        node.className = 'app'
+    function App({state}) {
+        return {
+            type: 'div',
+            props: {
+                className: 'app',
+                children: [
+                    {
+                        type: Header,
+                        props: {}
+                    },
+                    {
+                        type: Clock,
+                        props: {time: state.time}
+                    },
+                    {
+                        type: Coins,
+                        props: {coins: state.coins}
+                    }
+                ]
+            }
+        }
 
-        node.append(Header())
-        node.append(Clock({ time: state.time }))
-        node.append(Coins({ coins: state.coins }))
-
-        return node
     }
 
     function Header() {
-        const node = document.createElement('header')
-        node.className = 'header'
-
-        node.append(Logo())
-        return node
+        return {
+            type: 'header',
+            props: {
+                className: 'header',
+                children: [
+                    {
+                        type: Logo,
+                        props: {}
+                    }
+                ]
+            }
+        }
     }
 
     function Logo() {
-        const node = document.createElement('img')
-        node.className = 'logo'
-        node.src = 'logo.png'
-        return node
-    }
-
-    function Clock({ time }) {
-        const node = document.createElement('div')
-        node.className = 'clock'
-
-        const value = document.createElement('span')
-        value.className = 'value'
-        value.innerText = time.toLocaleString()
-
-        node.append(value)
-
-        const icon = document.createElement('span')
-
-        if (time.getHours() >= 7 && time.getHours() <= 21) {
-            icon.className = 'icon day'
-        } else {
-            icon.className = 'icon night'
+        return {
+            type: 'img',
+            props: {
+                className: 'logo',
+                src: 'logo.png',
+            }
         }
-
-        node.append(icon)
-
-        return node
     }
 
-    function Loading () {
-        const node = document.createElement('div')
-        node.className = 'loading'
-        node.innerText = 'Loading...'
-        return node
+    function Clock({time}) {
+        const isDay = time.getHours() >= 7 && time.getHours() <= 21
+
+        return {
+            type: 'div',
+            props: {
+                className: 'clock',
+                children: [
+                    {
+                        type: 'span',
+                        props: {
+                            className: 'value',
+                            children: [
+                                time.toLocaleString()
+                            ]
+                        }
+                    },
+                    {
+                        type: 'span',
+                        props: {
+                            className: isDay ? 'icon day' : 'icon night',
+                        }
+                    }
+                ]
+            }
+        }
     }
 
-    function Coins({ coins }) {
+    function Loading() {
+        return {
+            type: 'div',
+            props: {
+                className: 'loading',
+                children: [
+                    'Loading...'
+                ]
+            }
+        }
+    }
+
+    function Coins({coins}) {
         if (coins === null) {
-            return Loading()
+            return {
+                type: Loading,
+                props: {}
+            }
         }
 
-        const node = document.createElement('div')
-        node.className = 'coins'
-
-        coins.forEach((coin) => {
-            node.append(Coin({ coin }))
-        })
-
-        return node
+        return {
+            type: 'div',
+            props: {
+                className: 'coins',
+                children: coins.map((coin) => ({
+                    type: Coin,
+                    props: { coin }
+                }))
+            }
+        }
     }
 
-    function Coin({ coin }) {
-        const node = document.createElement('div')
-        node.className = 'coin'
-        node.dataset.key = coin.id
-
-        const name = document.createElement('h2')
-        name.innerText = coin.name
-        node.append(name)
-
-        const info = document.createElement('div')
-        info.className = 'info'
-
-        const description = document.createElement('p')
-        description.innerText = coin.description
-        info.append(description)
-
-        const price = document.createElement('div')
-        price.className = 'price'
-        price.innerText = coin.price
-        info.append(price)
-
-        node.append(info)
-
-        return node
+    function Coin({coin}) {
+        return {
+            type: 'div',
+            key: coin.id,
+            props: {
+                className: 'coin',
+                children: [
+                    {
+                        type: 'h2',
+                        props: {
+                            children: [
+                                coin.name
+                            ]
+                        },
+                    },
+                    {
+                        type: 'div',
+                        props: {
+                            className: 'info',
+                            children: [
+                                {
+                                    type: 'p',
+                                    props: {
+                                        children: [
+                                            coin.description
+                                        ]
+                                    }
+                                },
+                                {
+                                    type: 'div',
+                                    props: {
+                                        className: 'price',
+                                        children: [
+                                            coin.price
+                                        ]
+                                    }
+                                },
+                            ],
+                        },
+                    }
+                ],
+            }
+        }
     }
 
     //=======================
@@ -166,10 +223,9 @@
     //     App({ state }),
     //     document.getElementById('root')
     // )
-
-    function renderView (state) {
+    function renderView(state) {
         render(
-            App({ state }),
+            App({state}),
             document.getElementById('root')
         )
     }
@@ -208,49 +264,80 @@
                     return coin
                 })
             }
-        renderView(state)
-      }
+            renderView(state)
+        }
 
-      coins.forEach((coin) => {
-          stream.subscribe(`price-${coin.id}`, onPrice)
-      })
+        coins.forEach((coin) => {
+            stream.subscribe(`price-${coin.id}`, onPrice)
+        })
     })
 
     //=======================
 
-    function render (virtualDom, realDomRoot) {
-        const virtualDomRoot = document.createElement(realDomRoot.tagName)
+    function render(virtualDom, realDomRoot) {
+        // const virtualDomRoot = document.createElement(realDomRoot.tagName)
+        //
+        // virtualDomRoot.id = realDomRoot.id
+        // virtualDomRoot.appendChild(virtualDom)
 
-        virtualDomRoot.id = realDomRoot.id
-        virtualDomRoot.appendChild(virtualDom)
+
+        const evaluatedVirtualDom = evaluate(virtualDom)
+
+        const virtualDomRoot = {
+            type: realDomRoot.tagName.toLowerCase(),
+            props: {
+                id: realDomRoot.id,
+                children: [
+                    evaluatedVirtualDom
+                ]
+            },
+        }
+
 
         sync(virtualDomRoot, realDomRoot)
     }
 
+    function evaluate (virtualNode) {
+        if (typeof virtualNode !== 'object') {
+            return virtualNode
+        }
+
+        if (typeof virtualNode.type === 'function') {
+            return evaluate((virtualNode.type)(virtualNode.props))
+        }
+
+        const props = virtualNode.props || {}
+
+        return {
+            ...virtualNode,
+            props: {
+                ...props,
+                children: Array.isArray(props.children) ? props.children.map(evaluate) : [evaluate(props.children)]
+            }
+        }
+    }
+
     function sync (virtualNode, realNode) {
         // Sync element
-        if (virtualNode.id !== realNode.id) {
-            realNode.id = virtualNode.id
-        }
-        if (virtualNode.className !== realNode.className) {
-            realNode.className = virtualNode.className
-        }
-        if (virtualNode.attributes) {
-            Array.from(virtualNode.attributes).forEach((attr) => {
-                realNode[attr.name] = attr.value
+        if (virtualNode.props) {
+            Object.entries(virtualNode.props).forEach(([name, value]) => {
+                if (name === 'key' || name === 'children') {
+                    return
+                }
+                if (realNode[name] !== value) {
+                    realNode[name] = value
+                }
             })
         }
-        if (virtualNode.dataset) {
-            Object.keys(virtualNode.dataset).forEach((name) => {
-                realNode.dataset[name] = virtualNode.dataset[name]
-            })
+        if (virtualNode.key) {
+            realNode.dataset.key = virtualNode.key
         }
-        if (virtualNode.nodeValue !== realNode.nodeValue) {
-            realNode.nodeValue = virtualNode.nodeValue
+        if (typeof virtualNode !== 'object' && virtualNode !== realNode.nodeValue) {
+            realNode.nodeValue = virtualNode
         }
 
         // Sync child nodes
-        const virtualChildren = virtualNode.childNodes
+        const virtualChildren = virtualNode.props ? virtualNode.props.children || [] : []
         const realChildren = realNode.childNodes
 
         for (let i = 0; i < virtualChildren.length || i < realChildren.length; i++) {
@@ -263,12 +350,12 @@
             }
 
             // Update
-            if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName) {
+            if (virtual !== undefined && real !== undefined && (virtual.type || '') === (real.tagName || '').toLowerCase()) {
                 sync(virtual, real)
             }
 
             // Replace
-            if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName) {
+            if (virtual !== undefined && real !== undefined && (virtual.type || '') !== (real.tagName || '').toLowerCase()) {
                 const newReal = createRealNodeByVirtual(virtual)
                 sync(virtual, newReal)
                 realNode.replaceChild(newReal, real)
@@ -283,13 +370,13 @@
         }
     }
 
-    function createRealNodeByVirtual(virtual) {
-        if (virtual.nodeType === Node.TEXT_NODE) {
+    function createRealNodeByVirtual (virtual) {
+        if (typeof virtual !== 'object') {
             return document.createTextNode('')
         }
-        return document.createElement(virtual.tagName)
+        return document.createElement(virtual.type)
     }
 
-  </script>
+</script>
 </body>
 </html>
