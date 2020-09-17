@@ -137,6 +137,7 @@
     function Coin({ coin }) {
         const node = document.createElement('div')
         node.className = 'coin'
+        node.dataset.key = coin.id
 
         const name = document.createElement('h2')
         name.innerText = coin.name
@@ -237,6 +238,11 @@
         if (virtualNode.attributes) {
             Array.from(virtualNode.attributes).forEach((attr) => {
                 realNode[attr.name] = attr.value
+            })
+        }
+        if (virtualNode.dataset) {
+            Object.keys(virtualNode.dataset).forEach((name) => {
+                realNode.dataset[name] = virtualNode.dataset[name]
             })
         }
         if (virtualNode.nodeValue !== realNode.nodeValue) {
