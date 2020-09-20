@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <title>Demo Crypto</title>
 </head>
 <body>
@@ -171,7 +172,7 @@
     //     document.getElementById('root')
     // )
     function renderView(state) {
-        render(
+        ReactDOM.render(
             // VDom.createElement(App, { state }),
             React.createElement(App, { state }),
             document.getElementById('root')
@@ -222,7 +223,7 @@
 
     //=======================
 
-    function render(virtualDom, realDomRoot) {
+    function render(virtualDom, realDomRoot) { //not use
         // const virtualDomRoot = document.createElement(realDomRoot.tagName)
         //
         // virtualDomRoot.id = realDomRoot.id
@@ -245,7 +246,7 @@
         sync(virtualDomRoot, realDomRoot)
     }
 
-    function evaluate (virtualNode) {
+    function evaluate (virtualNode) { //not use
         if (typeof virtualNode !== 'object') {
             return virtualNode
         }
@@ -265,7 +266,7 @@
         }
     }
 
-    function sync (virtualNode, realNode) {
+    function sync (virtualNode, realNode) { //not use
         // Sync element
         if (virtualNode.props) {
             Object.entries(virtualNode.props).forEach(([name, value]) => {
