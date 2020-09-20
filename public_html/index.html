@@ -6,13 +6,14 @@
     <link rel="stylesheet" href="main.css">
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.js" crossorigin></script>
     <title>Demo Crypto</title>
 </head>
 <body>
 
 <div id="root"></div>
 
-<script type="text/own">
+<script type="text/babel">
 
     const api = {
         get(url) {
@@ -328,19 +329,20 @@
 
 </script>
 
-<script>
-    function convertToNativeJs (code) {
-        // ...
-        return code
-    }
+<!--<script>-->
+<!--    function convertToNativeJs (code) {-->
+<!--        // ...-->
+<!--        //return code-->
+<!--        return Babel.transform(code, { presets: ['stage-2'] }).code-->
+<!--    }-->
 
-    const scripts = document.querySelectorAll('script[type="text/own"]')
-    scripts.forEach(el => {
-        const js = convertToNativeJs(el.text)
-        const script = document.createElement('script')
-        script.text = js
-        document.querySelector('body').append(script)
-    })
-</script>
+<!--    const scripts = document.querySelectorAll('script[type="text/own"]')-->
+<!--    scripts.forEach(el => {-->
+<!--        const js = convertToNativeJs(el.text)-->
+<!--        const script = document.createElement('script')-->
+<!--        script.text = js-->
+<!--        document.querySelector('body').append(script)-->
+<!--    })-->
+<!--</script>-->
 </body>
 </html>
