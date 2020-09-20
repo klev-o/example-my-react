@@ -13,7 +13,7 @@
 
 <div id="root"></div>
 
-<script type="text/babel">
+<script type="text/jsx">
 
     const api = {
         get(url) {
@@ -91,10 +91,19 @@
         //     VDom.createElement(Clock, { time: state.time }),
         //     VDom.createElement(Coins, { coins: state.coins })
         // )
-        return React.createElement('div', { className: 'app' },
-            React.createElement(Header),
-            React.createElement(Clock, { time: state.time }),
-            React.createElement(Coins, { coins: state.coins })
+
+        // return React.createElement('div', { className: 'app' },
+        //     React.createElement(Header),
+        //     React.createElement(Clock, { time: state.time }),
+        //     React.createElement(Coins, { coins: state.coins })
+        // )
+
+        return (
+            <div className="app">
+                <Header />
+                <Clock time={state.time} />
+                <Coins coins={state.coins} />
+            </div>
         )
 
     }
@@ -103,14 +112,22 @@
         // return VDom.createElement('header', { className: 'header' },
         //     VDom.createElement(Logo)
         // )
-        return React.createElement('header', { className: 'header' },
-            React.createElement(Logo)
+
+        // return React.createElement('header', { className: 'header' },
+        //     React.createElement(Logo)
+        // )
+
+        return (
+            <header className="header">
+                <Logo />
+            </header>
         )
     }
 
     function Logo() {
         // return VDom.createElement('img', { className: 'logo', src: 'logo.png' })
-        return React.createElement('img', { className: 'logo', src: 'logo.png' })
+        // return React.createElement('img', { className: 'logo', src: 'logo.png' })
+        return <img className="logo" src="logo.png" alt="" />
     }
 
     function Clock({time}) {
@@ -121,29 +138,44 @@
         //     VDom.createElement('span', { className: isDay ? 'icon day' : 'icon night' }),
         // )
 
-        return React.createElement('div', { className: 'clock' },
-            React.createElement('span', { className: 'value' }, time.toLocaleTimeString()),
-            React.createElement('span', { className: isDay ? 'icon day' : 'icon night' }),
+        // return React.createElement('div', { className: 'clock' },
+        //     React.createElement('span', { className: 'value' }, time.toLocaleTimeString()),
+        //     React.createElement('span', { className: isDay ? 'icon day' : 'icon night' }),
+        // )
+
+        return (
+            <div className="clock">
+                <span className="value">{time.toLocaleString()}</span>
+                <span className={isDay ? 'icon day' : 'icon night'} />
+            </div>
         )
     }
 
     function Loading() {
         // return VDom.createElement('div', { className: 'loading' }, 'Loading...')
-        return React.createElement('div', { className: 'loading' }, 'Loading...')
+        // return React.createElement('div', { className: 'loading' }, 'Loading...')
+        return <div className="loading">Loading...</div>
     }
 
     function Coins({coins}) {
         if (coins === null) {
             //return VDom.createElement(Loading)
-            return React.createElement(Loading)
+            // return React.createElement(Loading)
+            return <Loading />
         }
 
         // return VDom.createElement('div', { className: 'lots' },
         //     coins.map((coin) => VDom.createElement(Coin, { coin, key: coin.id }))
         // )
 
-        return React.createElement('div', { className: 'coins' },
-            coins.map((coin) => React.createElement(Coin, { coin, key: coin.id }))
+        // return React.createElement('div', { className: 'coins' },
+        //     coins.map((coin) => React.createElement(Coin, { coin, key: coin.id }))
+        // )
+
+        return (
+            <div className="coins">
+                {coins.map((coin) => <Coin coin={coin} key={coin.id} />)}
+            </div>
         )
     }
 
@@ -157,12 +189,22 @@
         //     ),
         // )
 
-        return React.createElement('div', { className: 'coin' },
-            React.createElement('h2', {}, coin.name),
-            React.createElement('div', {className: 'info'},
-                React.createElement('p', {}, coin.description),
-                React.createElement('div', {className: 'price'}, coin.price)
-            )
+        // return React.createElement('div', { className: 'coin' },
+        //     React.createElement('h2', {}, coin.name),
+        //     React.createElement('div', {className: 'info'},
+        //         React.createElement('p', {}, coin.description),
+        //         React.createElement('div', {className: 'price'}, coin.price)
+        //     )
+        // )
+
+        return (
+            <div className="coin">
+                <h2>{coin.name}</h2>
+                <div className="info">
+                    <p>{coin.description}</p>
+                    <div className="price">{coin.price}</div>
+                </div>
+            </div>
         )
     }
 
@@ -175,7 +217,8 @@
     function renderView(state) {
         ReactDOM.render(
             // VDom.createElement(App, { state }),
-            React.createElement(App, { state }),
+            // React.createElement(App, { state }),
+            <App state={state} />,
             document.getElementById('root')
         )
     }
