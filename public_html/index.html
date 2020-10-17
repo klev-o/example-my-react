@@ -86,6 +86,11 @@
     class Store {
       constructor (initialState) {
         this.state = initialState
+        this.listeners = []
+      }
+
+      subscribe (callback) {
+        this.listeners.push(callback)
       }
 
       getState () {
@@ -98,6 +103,10 @@
           //...diff
           ...(typeof diff === 'function' ? diff(this.state) : diff)
         }
+
+        this.listeners.forEach((listener) => {
+          listener()
+        })
       }
     }
 
@@ -243,6 +252,10 @@
         )
     }
 
+    store.subscribe(() => {
+      renderView(store.getState())
+    })
+
     renderView(store.getState())
 
     //=======================
@@ -251,8 +264,6 @@
       store.changeState({
         time: new Date()
       })
-
-      renderView(store.getState())
 
     }, 1000)
 
@@ -264,7 +275,6 @@
         store.changeState({
           coins
         });
-        renderView(store.getState())
 
         // const onPrice = (data) => {
         //     state = {
@@ -294,7 +304,6 @@
               return coin
             })
           }));
-          renderView(store.getState())
         }
 
         coins.forEach((coin) => {
