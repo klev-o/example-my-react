@@ -95,7 +95,8 @@
       changeState (diff) {
         this.state = {
           ...this.state,
-          ...diff
+          //...diff
+          ...(typeof diff === 'function' ? diff(this.state) : diff)
         }
       }
     }
@@ -282,8 +283,8 @@
         // }
 
         const onPrice = (data) => {
-          store.changeState({
-            coins: store.getState().coins.map((coin) => {
+          store.changeState((state) => ({
+            coins: state.coins.map((coin) => {
               if (coin.id === data.id) {
                 return {
                   ...coin,
@@ -292,7 +293,7 @@
               }
               return coin
             })
-          });
+          }));
           renderView(store.getState())
         }
 
