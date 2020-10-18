@@ -101,13 +101,18 @@
         return this.state
       }
 
-      changeState (diff) {
-        this.state = {
-          ...this.state,
-          //...diff
-          ...(typeof diff === 'function' ? diff(this.state) : diff)
-        }
+      // changeState (diff) {
+      //   this.state = {
+      //     ...this.state,
+      //     //...diff
+      //     ...(typeof diff === 'function' ? diff(this.state) : diff)
+      //   }
+      //
+      //   this.listeners.forEach((listener) => listener())
+      // }
 
+      setState (state) {
+        this.state = (typeof state === 'function' ? state(this.state) : state)
         this.listeners.forEach((listener) => listener())
       }
     }
@@ -263,9 +268,10 @@
     //=======================
 
     setInterval(() => {
-      store.changeState({
+      store.setState((state) => ({
+        ...state,
         time: new Date()
-      })
+      }))
 
     }, 1000)
 
@@ -274,9 +280,10 @@
         //     ...state,
         //     coins
         // }
-        store.changeState({
+        store.setState((state) => ({
+          ...state,
           coins
-        });
+        }));
 
         // const onPrice = (data) => {
         //     state = {
@@ -295,7 +302,8 @@
         // }
 
         const onPrice = (data) => {
-          store.changeState((state) => ({
+          store.setState((state) => ({
+            ...state,
             coins: state.coins.map((coin) => {
               if (coin.id === data.id) {
                 return {
