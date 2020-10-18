@@ -117,6 +117,30 @@
       }
     }
 
+    //=========Action creator
+
+    function createSetTimeAction (time) {
+      return {
+        type: SET_TIME,
+        time
+      }
+    }
+
+    function createSetCoinsAction (coins) {
+      return {
+        type: SET_COINS,
+        coins
+      }
+    }
+
+    function createChangeCoinPriceAction (id, price) {
+      return {
+        type: CHANGE_COIN_PRICE,
+        id,
+        price
+      }
+    }
+
     //=======================
 
 
@@ -345,10 +369,11 @@
 
 
     setInterval(() => {
-      store.dispatch({
-        type: SET_TIME,
-        time: new Date()
-      })
+      // store.dispatch({
+      //   type: SET_TIME,
+      //   time: new Date()
+      // })
+      store.dispatch(createSetTimeAction(new Date()))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -361,10 +386,12 @@
         //   coins
         // }));
 
-        store.dispatch({
-          type: SET_COINS,
-          coins
-        })
+        // store.dispatch({
+        //   type: SET_COINS,
+        //   coins
+        // })
+
+        store.dispatch(createSetCoinsAction(coins))
 
         // const onPrice = (data) => {
         //     state = {
@@ -403,11 +430,12 @@
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
-              store.dispatch( {
-                type: CHANGE_COIN_PRICE,
-                id: data.id,
-                price: data.price
-              })
+              // store.dispatch( {
+              //   type: CHANGE_COIN_PRICE,
+              //   id: data.id,
+              //   price: data.price
+              // })
+              store.dispatch(createChangeCoinPriceAction(data.id, data.price))
             })
         })
     })
