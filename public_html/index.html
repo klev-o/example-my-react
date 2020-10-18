@@ -296,19 +296,23 @@
     //   }
     // }
 
+    const SET_TIME = 'SET_TIME'
+    const SET_COINS = 'SET_COINS'
+    const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
+
     function appReducer (state, action) {
       switch (action.type) {
-        case 'setTime':
+        case SET_TIME:
           return {
             ...state,
             time: action.time
           }
-        case 'setCoins':
+        case SET_COINS:
           return {
             ...state,
             coins: action.coins
           }
-        case 'changeCoinPrice':
+        case CHANGE_COIN_PRICE:
           return {
             ...state,
             coins: state.coins.map((coin) => {
@@ -328,7 +332,7 @@
 
     setInterval(() => {
       store.setState((state) => appReducer(state, {
-        type: 'setTime',
+        type: SET_TIME,
         time: new Date()
       }))
     }, 1000)
@@ -344,7 +348,7 @@
         // }));
 
         store.setState((state) => appReducer(state, {
-          type: 'setCoins',
+          type: SET_COINS,
           coins
         }))
 
@@ -386,7 +390,7 @@
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
               store.setState((state) => appReducer(state, {
-                type: 'changeCoinPrice',
+                type: CHANGE_COIN_PRICE,
                 id: data.id,
                 price: data.price
               }))
