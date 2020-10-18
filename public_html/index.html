@@ -267,12 +267,37 @@
 
     //=======================
 
-    setInterval(() => {
-      store.setState((state) => ({
+    function setTime (state, time) {
+      return {
         ...state,
-        time: new Date()
-      }))
+        time
+      }
+    }
 
+    function setCoins (state, coins) {
+      return {
+        ...state,
+        coins
+      }
+    }
+
+    function changeCoinPrice (state, id, price) {
+      return {
+        ...state,
+        coins: state.coins.map((coin) => {
+          if (coin.id === id) {
+            return {
+              ...coin,
+              price: price
+            }
+          }
+          return coin
+        })
+      }
+    }
+
+    setInterval(() => {
+      store.setState((state) => setTime(state, new Date()))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -280,10 +305,12 @@
         //     ...state,
         //     coins
         // }
-        store.setState((state) => ({
-          ...state,
-          coins
-        }));
+        // store.setState((state) => ({
+        //   ...state,
+        //   coins
+        // }));
+
+        store.setState((state) => setCoins(state, coins))
 
         // const onPrice = (data) => {
         //     state = {
@@ -301,20 +328,24 @@
         //     renderView(state)
         // }
 
-        const onPrice = (data) => {
-          store.setState((state) => ({
-            ...state,
-            coins: state.coins.map((coin) => {
-              if (coin.id === data.id) {
-                return {
-                  ...coin,
-                  price: data.price
-                }
-              }
-              return coin
-            })
-          }));
-        }
+        // const onPrice = (data) => {
+        //   store.setState((state) => ({
+        //     ...state,
+        //     coins: state.coins.map((coin) => {
+        //       if (coin.id === data.id) {
+        //         return {
+        //           ...coin,
+        //           price: data.price
+        //         }
+        //       }
+        //       return coin
+        //     })
+        //   }));
+        // }
+
+      const onPrice = (data) => {
+        store.setState((state) => changeCoinPrice(state, data.id, data.price))
+      }
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, onPrice)
