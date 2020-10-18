@@ -78,22 +78,42 @@
 
     //=======================
 
-    const initialState = {
-      time: new Date(),
-      coins: null
+    const clockInitialState = {
+      time: new Date()
     }
 
     const SET_TIME = 'SET_TIME'
-    const SET_COINS = 'SET_COINS'
-    const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
 
-    function appReducer (state = initialState, action) {
+    function clockReducer (state = clockInitialState, action) {
       switch (action.type) {
         case SET_TIME:
           return {
             ...state,
             time: action.time
           }
+        default:
+          return state
+      }
+    }
+
+    function setTime (time) {
+      return {
+        type: SET_TIME,
+        time
+      }
+    }
+
+    //=======================
+
+    const cryptoInitialState = {
+      coins: null
+    }
+
+    const SET_COINS = 'SET_COINS'
+    const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
+
+    function cryptoReducer  (state = cryptoInitialState, action) {
+      switch (action.type) {
         case SET_COINS:
           return {
             ...state,
@@ -114,15 +134,6 @@
           }
         default:
           return state
-      }
-    }
-
-    //=========Action creator
-
-    function setTime (time) {
-      return {
-        type: SET_TIME,
-        time
       }
     }
 
@@ -187,7 +198,22 @@
 
     //=======================
 
-    const store = new Store(appReducer)
+    //const store = new Store(appReducer)
+
+    function combineReducers(reducers) {
+      return (state = {}, action) => {
+        const result = {};
+        Object.entries(reducers).forEach(([key, reducer]) => {
+          result[key] = reducer(state[key], action)
+        })
+        return result
+      }
+    }
+
+    const store = new Store(combineReducers({
+      clock: clockReducer,
+      crypto: cryptoReducer
+    }))
 
     //=======================
 
@@ -207,8 +233,8 @@
         return (
             <div className="app">
                 <Header />
-                <Clock time={state.time} />
-                <Coins coins={state.coins} />
+                <Clock time={state.clock.time} />
+                <Coins coins={state.crypto.coins} />
             </div>
         )
 
