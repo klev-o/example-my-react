@@ -267,37 +267,67 @@
 
     //=======================
 
-    function setTime (state, params) {
-      return {
-        ...state,
-        time: params.time
-      }
-    }
+    // function setTime (state, params) {
+    //   return {
+    //     ...state,
+    //     time: params.time
+    //   }
+    // }
+    //
+    // function setCoins (state, params) {
+    //   return {
+    //     ...state,
+    //     coins: params.coins
+    //   }
+    // }
+    //
+    // function changeCoinPrice (state, params) {
+    //   return {
+    //     ...state,
+    //     coins: state.coins.map((coin) => {
+    //       if (coin.id === params.id) {
+    //         return {
+    //           ...coin,
+    //           price: params.price
+    //         }
+    //       }
+    //       return coin
+    //     })
+    //   }
+    // }
 
-    function setCoins (state, params) {
-      return {
-        ...state,
-        coins: params.coins
-      }
-    }
-
-    function changeCoinPrice (state, params) {
-      return {
-        ...state,
-        coins: state.coins.map((coin) => {
-          if (coin.id === params.id) {
-            return {
-              ...coin,
-              price: params.price
-            }
+    function appReducer (state, action, params) {
+      switch (action) {
+        case 'setTime':
+          return {
+            ...state,
+            time: params.time
           }
-          return coin
-        })
+        case 'setCoins':
+          return {
+            ...state,
+            coins: params.coins
+          }
+        case 'changeCoinPrice':
+          return {
+            ...state,
+            coins: state.coins.map((coin) => {
+              if (coin.id === params.id) {
+                return {
+                  ...coin,
+                  price: params.price
+                }
+              }
+              return coin
+            })
+          }
+        default:
+          return state
       }
     }
 
     setInterval(() => {
-      store.setState((state) => setTime(state, {time: new Date() }))
+      store.setState((state) => appReducer(state, 'setTime', {time: new Date() }))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -310,7 +340,7 @@
         //   coins
         // }));
 
-        store.setState((state) => setCoins(state, { coins }))
+        store.setState((state) => appReducer(state, 'setCoins', { coins }))
 
         // const onPrice = (data) => {
         //     state = {
@@ -349,7 +379,7 @@
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
-              store.setState((state) => changeCoinPrice(state, {
+              store.setState((state) => appReducer(state, 'changeCoinPrice', {
                 id: data.id,
                 price: data.price
               }))
