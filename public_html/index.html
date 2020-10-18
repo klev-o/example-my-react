@@ -78,13 +78,50 @@
 
     //=======================
 
+    const SET_TIME = 'SET_TIME'
+    const SET_COINS = 'SET_COINS'
+    const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
+
+    function appReducer (state, action) {
+      switch (action.type) {
+        case SET_TIME:
+          return {
+            ...state,
+            time: action.time
+          }
+        case SET_COINS:
+          return {
+            ...state,
+            coins: action.coins
+          }
+        case CHANGE_COIN_PRICE:
+          return {
+            ...state,
+            coins: state.coins.map((coin) => {
+              if (coin.id === action.id) {
+                return {
+                  ...coin,
+                  price: action.price
+                }
+              }
+              return coin
+            })
+          }
+        default:
+          return state
+      }
+    }
+
+    //=======================
+
     const initialState = {
       time: new Date(),
       coins: null
     }
 
     class Store {
-      constructor (initialState) {
+      constructor (reducer, initialState) {
+        this.reducer = reducer
         this.state = initialState
         this.listeners = []
       }
@@ -111,13 +148,20 @@
       //   this.listeners.forEach((listener) => listener())
       // }
 
-      setState (state) {
-        this.state = (typeof state === 'function' ? state(this.state) : state)
+      // setState (state) {
+      //   this.state = (typeof state === 'function' ? state(this.state) : state)
+      //   this.listeners.forEach((listener) => listener())
+      // }
+
+      dispatch (action) {
+        this.state = this.reducer(this.state, action)
         this.listeners.forEach((listener) => listener())
       }
     }
 
-    const store = new Store(initialState)
+    //=======================
+
+    const store = new Store(appReducer, initialState)
 
     //=======================
 
@@ -296,45 +340,13 @@
     //   }
     // }
 
-    const SET_TIME = 'SET_TIME'
-    const SET_COINS = 'SET_COINS'
-    const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
 
-    function appReducer (state, action) {
-      switch (action.type) {
-        case SET_TIME:
-          return {
-            ...state,
-            time: action.time
-          }
-        case SET_COINS:
-          return {
-            ...state,
-            coins: action.coins
-          }
-        case CHANGE_COIN_PRICE:
-          return {
-            ...state,
-            coins: state.coins.map((coin) => {
-              if (coin.id === action.id) {
-                return {
-                  ...coin,
-                  price: action.price
-                }
-              }
-              return coin
-            })
-          }
-        default:
-          return state
-      }
-    }
 
     setInterval(() => {
-      store.setState((state) => appReducer(state, {
+      store.dispatch({
         type: SET_TIME,
         time: new Date()
-      }))
+      })
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -347,10 +359,10 @@
         //   coins
         // }));
 
-        store.setState((state) => appReducer(state, {
+        store.dispatch({
           type: SET_COINS,
           coins
-        }))
+        })
 
         // const onPrice = (data) => {
         //     state = {
@@ -389,11 +401,11 @@
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
-              store.setState((state) => appReducer(state, {
+              store.dispatch( {
                 type: CHANGE_COIN_PRICE,
                 id: data.id,
                 price: data.price
-              }))
+              })
             })
         })
     })
