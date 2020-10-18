@@ -89,8 +89,12 @@
         this.listeners = []
       }
 
-      subscribe (callback) {
-        this.listeners.push(callback)
+      subscribe (listener) {
+        this.listeners.push(listener)
+        return () => {
+          const index = this.listeners.indexOf(listener)
+          this.listeners.splice(index, 1)
+        }
       }
 
       getState () {
