@@ -119,21 +119,21 @@
 
     //=========Action creator
 
-    function createSetTimeAction (time) {
+    function setTime (time) {
       return {
         type: SET_TIME,
         time
       }
     }
 
-    function createSetCoinsAction (coins) {
+    function setCoins (coins) {
       return {
         type: SET_COINS,
         coins
       }
     }
 
-    function createChangeCoinPriceAction (id, price) {
+    function changeCoinPrice (id, price) {
       return {
         type: CHANGE_COIN_PRICE,
         id,
@@ -373,7 +373,7 @@
       //   type: SET_TIME,
       //   time: new Date()
       // })
-      store.dispatch(createSetTimeAction(new Date()))
+      store.dispatch(setTime(new Date()))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -391,7 +391,7 @@
         //   coins
         // })
 
-        store.dispatch(createSetCoinsAction(coins))
+        store.dispatch(setCoins(coins))
 
         // const onPrice = (data) => {
         //     state = {
@@ -435,7 +435,7 @@
               //   id: data.id,
               //   price: data.price
               // })
-              store.dispatch(createChangeCoinPriceAction(data.id, data.price))
+              store.dispatch(changeCoinPrice(data.id, data.price))
             })
         })
     })
