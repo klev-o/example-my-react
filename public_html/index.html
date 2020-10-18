@@ -343,12 +343,14 @@
         //   }));
         // }
 
-      const onPrice = (data) => {
-        store.setState((state) => changeCoinPrice(state, data.id, data.price))
-      }
+      // const onPrice = (data) => {
+      //   store.setState((state) => changeCoinPrice(state, data.id, data.price))
+      // }
 
         coins.forEach((coin) => {
-            stream.subscribe(`price-${coin.id}`, onPrice)
+            stream.subscribe(`price-${coin.id}`, (data) => {
+              store.setState((state) => changeCoinPrice(state, data.id, data.price))
+            })
         })
     })
 
