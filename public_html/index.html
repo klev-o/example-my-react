@@ -267,28 +267,28 @@
 
     //=======================
 
-    function setTime (state, time) {
+    function setTime (state, params) {
       return {
         ...state,
-        time
+        time: params.time
       }
     }
 
-    function setCoins (state, coins) {
+    function setCoins (state, params) {
       return {
         ...state,
-        coins
+        coins: params.coins
       }
     }
 
-    function changeCoinPrice (state, id, price) {
+    function changeCoinPrice (state, params) {
       return {
         ...state,
         coins: state.coins.map((coin) => {
-          if (coin.id === id) {
+          if (coin.id === params.id) {
             return {
               ...coin,
-              price: price
+              price: params.price
             }
           }
           return coin
@@ -297,7 +297,7 @@
     }
 
     setInterval(() => {
-      store.setState((state) => setTime(state, new Date()))
+      store.setState((state) => setTime(state, {time: new Date() }))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -310,7 +310,7 @@
         //   coins
         // }));
 
-        store.setState((state) => setCoins(state, coins))
+        store.setState((state) => setCoins(state, { coins }))
 
         // const onPrice = (data) => {
         //     state = {
@@ -349,7 +349,10 @@
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
-              store.setState((state) => changeCoinPrice(state, data.id, data.price))
+              store.setState((state) => changeCoinPrice(state, {
+                id: data.id,
+                price: data.price
+              }))
             })
         })
     })
