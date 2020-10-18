@@ -296,26 +296,26 @@
     //   }
     // }
 
-    function appReducer (state, action, params) {
-      switch (action) {
+    function appReducer (state, action) {
+      switch (action.type) {
         case 'setTime':
           return {
             ...state,
-            time: params.time
+            time: action.time
           }
         case 'setCoins':
           return {
             ...state,
-            coins: params.coins
+            coins: action.coins
           }
         case 'changeCoinPrice':
           return {
             ...state,
             coins: state.coins.map((coin) => {
-              if (coin.id === params.id) {
+              if (coin.id === action.id) {
                 return {
                   ...coin,
-                  price: params.price
+                  price: action.price
                 }
               }
               return coin
@@ -327,7 +327,10 @@
     }
 
     setInterval(() => {
-      store.setState((state) => appReducer(state, 'setTime', {time: new Date() }))
+      store.setState((state) => appReducer(state, {
+        type: 'setTime',
+        time: new Date()
+      }))
     }, 1000)
 
     api.get('/coins').then((coins) => {
@@ -340,7 +343,10 @@
         //   coins
         // }));
 
-        store.setState((state) => appReducer(state, 'setCoins', { coins }))
+        store.setState((state) => appReducer(state, {
+          type: 'setCoins',
+          coins
+        }))
 
         // const onPrice = (data) => {
         //     state = {
@@ -379,7 +385,8 @@
 
         coins.forEach((coin) => {
             stream.subscribe(`price-${coin.id}`, (data) => {
-              store.setState((state) => appReducer(state, 'changeCoinPrice', {
+              store.setState((state) => appReducer(state, {
+                type: 'changeCoinPrice',
                 id: data.id,
                 price: data.price
               }))
