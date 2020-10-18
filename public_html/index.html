@@ -78,11 +78,16 @@
 
     //=======================
 
+    const initialState = {
+      time: new Date(),
+      coins: null
+    }
+
     const SET_TIME = 'SET_TIME'
     const SET_COINS = 'SET_COINS'
     const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
 
-    function appReducer (state, action) {
+    function appReducer (state = initialState, action) {
       switch (action.type) {
         case SET_TIME:
           return {
@@ -114,15 +119,12 @@
 
     //=======================
 
-    const initialState = {
-      time: new Date(),
-      coins: null
-    }
 
     class Store {
       constructor (reducer, initialState) {
         this.reducer = reducer
-        this.state = initialState
+        //this.state = initialState
+        this.state = reducer(initialState, { type: null })
         this.listeners = []
       }
 
@@ -161,7 +163,7 @@
 
     //=======================
 
-    const store = new Store(appReducer, initialState)
+    const store = new Store(appReducer)
 
     //=======================
 
