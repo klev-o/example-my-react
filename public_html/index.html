@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.js" crossorigin></script>
+    <script src="https://unpkg.com/redux@4/dist/redux.js" crossorigin></script>
     <title>Demo Crypto</title>
 </head>
 <body>
@@ -210,7 +211,12 @@
       }
     }
 
-    const store = new Store(combineReducers({
+    // const store = new Store(combineReducers({
+    //   clock: clockReducer,
+    //   crypto: cryptoReducer
+    // }))
+
+    const store = Redux.createStore(Redux.combineReducers({
       clock: clockReducer,
       crypto: cryptoReducer
     }))
