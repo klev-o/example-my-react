@@ -44,6 +44,23 @@
                 default:
                     throw new Error('Unknown address')
             }
+        },
+        post (url) {
+          if (/^\/coins\/(\d+)\/favorite$/.exec(url)) {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({})
+              }, 500)
+            })
+          }
+          if (/^\/coins\/(\d+)\/unfavorite$/.exec(url)) {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({})
+              }, 500)
+            })
+          }
+          throw new Error('Unknown address')
         }
     }
 
@@ -115,6 +132,8 @@
 
     const SET_COINS = 'SET_COINS'
     const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
+    const FAVORITE_COIN = 'FAVORITE_COIN'
+    const UNFAVORITE_COIN = 'UNFAVORITE_COIN'
 
     function cryptoReducer  (state = cryptoInitialState, action) {
       switch (action.type) {
@@ -131,6 +150,32 @@
                 return {
                   ...coin,
                   price: action.price
+                }
+              }
+              return coin
+            })
+          }
+        case FAVORITE_COIN:
+          return {
+            ...state,
+            coins: state.coins.map((coin) => {
+              if (coin.id === action.id) {
+                return {
+                  ...coin,
+                  favorite: true
+                }
+              }
+              return coin
+            })
+          }
+        case UNFAVORITE_COIN:
+          return {
+            ...state,
+            coins: state.coins.map((coin) => {
+              if (coin.id === action.id) {
+                return {
+                  ...coin,
+                  favorite: false
                 }
               }
               return coin
@@ -153,6 +198,20 @@
         type: CHANGE_COIN_PRICE,
         id,
         price
+      }
+    }
+
+    function favoriteCoin (id) {
+      return {
+        type: FAVORITE_COIN,
+        id
+      }
+    }
+
+    function unfavoriteCoin (id) {
+      return {
+        type: UNFAVORITE_COIN,
+        id
       }
     }
 
@@ -363,6 +422,18 @@
     }
 
     //=======================
+
+    const favorite = (id) => {
+      api.post(`/coins/${id}/favorite`).then(() => {
+        store.dispatch(favoriteCoin(id))
+      })
+    }
+
+    const unfavorite = (id) => {
+      api.post(`/coins/${id}/unfavorite`).then(() => {
+        store.dispatch(unfavoriteCoin(id))
+      })
+    }
 
     // render(
     //     App({ state }),
