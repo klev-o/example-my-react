@@ -62,6 +62,11 @@ body {
   margin-bottom: 10px;
 }
 
+.coin.favorite {
+    border-color: #fff768;
+    background: #fff768;
+}
+
 .coin .info {
   display: flex;
   justify-content: space-between;
