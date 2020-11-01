@@ -88,6 +88,20 @@ body {
     border-radius: 5px;
 }
 
+.coin button.favorite {
+    color: #000;
+    border: 1px solid #999;
+}
+
+.coin button.unfavorite {
+
+
+    background: #000;
+    border: 1px solid #000;
+    color: #fff;
+
+}
+
 .loading {
   padding: 10px;
   border-radius: 6px;
