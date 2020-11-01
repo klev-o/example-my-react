@@ -437,23 +437,38 @@
 
     //=======================
 
-    const favorite = (id) => {
-      api.post(`/coins/${id}/favorite`).then(() => {
-        store.dispatch(favoriteCoin(id))
-      })
-    }
-
-    const unfavorite = (id) => {
-      api.post(`/coins/${id}/unfavorite`).then(() => {
-        store.dispatch(unfavoriteCoin(id))
-      })
-    }
+    // const favorite = (id) => {
+    //   api.post(`/coins/${id}/favorite`).then(() => {
+    //     store.dispatch(favoriteCoin(id))
+    //   })
+    // }
+    //
+    // const unfavorite = (id) => {
+    //   api.post(`/coins/${id}/unfavorite`).then(() => {
+    //     store.dispatch(unfavoriteCoin(id))
+    //   })
+    //}
 
     // render(
     //     App({ state }),
     //     document.getElementById('root')
     // )
-    function renderView(state) {
+    function renderView(store) {
+
+        const state = store.getState()
+
+        const favorite = (id) => {
+          api.post(`/coins/${id}/favorite`).then(() => {
+            store.dispatch(favoriteCoin(id))
+          })
+        }
+
+        const unfavorite = (id) => {
+          api.post(`/coins/${id}/unfavorite`).then(() => {
+            store.dispatch(unfavoriteCoin(id))
+          })
+        }
+
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
@@ -463,10 +478,10 @@
     }
 
     store.subscribe(() => {
-      renderView(store.getState())
+      renderView(store)
     })
 
-    renderView(store.getState())
+    renderView(store)
 
     //=======================
 
