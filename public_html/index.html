@@ -285,7 +285,7 @@
 
     //=======================
 
-    function App({state}) {
+    function App({state, favorite, unfavorite}) {
         // return VDom.createElement('div', { className: 'app' },
         //     VDom.createElement(Header),
         //     VDom.createElement(Clock, { time: state.time }),
@@ -302,7 +302,11 @@
             <div className="app">
                 <Header />
                 <Clock time={state.clock.time} />
-                <Coins coins={state.crypto.coins} />
+                <Coins
+                  coins={state.crypto.coins}
+                  favorite={favorite}
+                  unfavorite={unfavorite}
+                />
             </div>
         )
 
@@ -357,7 +361,7 @@
         return <div className="loading">Loading...</div>
     }
 
-    function Coins({coins}) {
+    function Coins({coins, favorite, unfavorite }) {
         if (coins === null) {
             //return VDom.createElement(Loading)
             // return React.createElement(Loading)
@@ -374,12 +378,18 @@
 
         return (
             <div className="coins">
-                {coins.map((coin) => <Coin coin={coin} key={coin.id} />)}
+                {coins.map((coin) =>
+                  <Coin
+                    coin={coin}
+                    key={coin.id}
+                    favorite={favorite}
+                    unfavorite={unfavorite}
+                  />)}
             </div>
         )
     }
 
-    function Coin({coin}) {
+    function Coin({coin, favorite, unfavorite}) {
 
         // return VDom.createElement('div', { className: 'coin' },
         //     VDom.createElement('h2', {}, coin.name),
@@ -404,18 +414,22 @@
                     <p>{coin.description}</p>
                     <div className="price">{coin.price}</div>
                 </div>
-                <Favorite active={coin.favorite} />
+                <Favorite
+                  active={coin.favorite}
+                  favorite={() => favorite(coin.id)}
+                  unfavorite={() => unfavorite(coin.id)}
+                />
             </div>
         )
     }
 
-    function Favorite ({ active }) {
+    function Favorite ({ active, favorite, unfavorite }) {
       return active ? (
-        <button type="button" className="unfavorite">
+        <button type="button" onClick={unfavorite} className="unfavorite">
           <ion-icon name="heart-sharp" /> Unfavorite
         </button>
       ) : (
-        <button type="button" className="favorite">
+        <button type="button" onClick={favorite} className="favorite">
           <ion-icon name="heart-outline" /> Favorite
         </button>
       )
@@ -443,7 +457,7 @@
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
-            <App state={state} />,
+            <App state={state} favorite={favorite} unfavorite={unfavorite} />,
             document.getElementById('root')
         )
     }
