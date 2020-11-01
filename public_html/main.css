@@ -80,6 +80,14 @@ body {
   margin: 0;
 }
 
+.coin button {
+    cursor: pointer;
+    outline: none;
+    border: 1px solid #000;
+    color: #000;
+    border-radius: 5px;
+}
+
 .loading {
   padding: 10px;
   border-radius: 6px;

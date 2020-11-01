@@ -344,6 +344,10 @@
                     <p>{coin.description}</p>
                     <div className="price">{coin.price}</div>
                 </div>
+                {coin.favorite
+                  ? <button type="button">Unfavorite</button>
+                  : <button type="button">Favorite</button>
+                }
             </div>
         )
     }
