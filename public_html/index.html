@@ -285,7 +285,7 @@
 
     //=======================
 
-    function App ({ state, dispatch }) {
+    function App ({ store }) {
         // return VDom.createElement('div', { className: 'app' },
         //     VDom.createElement(Header),
         //     VDom.createElement(Clock, { time: state.time }),
@@ -297,6 +297,9 @@
         //     React.createElement(Clock, { time: state.time }),
         //     React.createElement(Coins, { coins: state.coins })
         // )
+        const state = store.getState()
+        const dispatch = store.dispatch
+
         const time = state.clock.time
         const coins = state.crypto.coins
 
@@ -469,16 +472,13 @@
     // )
     function renderView(store) {
 
-        const state = store.getState()
-        const dispatch = store.dispatch
+        // const state = store.getState()
+        // const dispatch = store.dispatch
 
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
-            <App
-              state={state}
-              dispatch={dispatch}
-            />,
+            <App store={store}/>,
             document.getElementById('root')
         )
     }
