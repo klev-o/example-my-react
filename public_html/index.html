@@ -285,7 +285,7 @@
 
     //=======================
 
-    function App ({ time, coins, favorite, unfavorite }) {
+    function App ({ state, dispatch }) {
         // return VDom.createElement('div', { className: 'app' },
         //     VDom.createElement(Header),
         //     VDom.createElement(Clock, { time: state.time }),
@@ -297,6 +297,20 @@
         //     React.createElement(Clock, { time: state.time }),
         //     React.createElement(Coins, { coins: state.coins })
         // )
+        const time = state.clock.time
+        const coins = state.crypto.coins
+
+        const favorite = (id) => {
+          api.post(`/coins/${id}/favorite`).then(() => {
+            dispatch(favoriteCoin(id))
+          })
+        }
+
+        const unfavorite = (id) => {
+          api.post(`/coins/${id}/unfavorite`).then(() => {
+            dispatch(unfavoriteCoin(id))
+          })
+        }
 
         return (
             <div className="app">
@@ -458,30 +472,12 @@
         const state = store.getState()
         const dispatch = store.dispatch
 
-        const time = state.clock.time
-        const coins = state.crypto.coins
-
-
-        const favorite = (id) => {
-          api.post(`/coins/${id}/favorite`).then(() => {
-            dispatch(favoriteCoin(id))
-          })
-        }
-
-        const unfavorite = (id) => {
-          api.post(`/coins/${id}/unfavorite`).then(() => {
-            dispatch(unfavoriteCoin(id))
-          })
-        }
-
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
             <App
-              time={time}
-              coins={coins}
-              favorite={favorite}
-              unfavorite={unfavorite}
+              state={state}
+              dispatch={dispatch}
             />,
             document.getElementById('root')
         )
