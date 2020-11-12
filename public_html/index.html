@@ -285,7 +285,7 @@
 
     //=======================
 
-    function App({state, favorite, unfavorite}) {
+    function App ({ time, coins, favorite, unfavorite }) {
         // return VDom.createElement('div', { className: 'app' },
         //     VDom.createElement(Header),
         //     VDom.createElement(Clock, { time: state.time }),
@@ -301,9 +301,9 @@
         return (
             <div className="app">
                 <Header />
-                <Clock time={state.clock.time} />
+                <Clock time={time} />
                 <Coins
-                  coins={state.crypto.coins}
+                  coins={coins}
                   favorite={favorite}
                   unfavorite={unfavorite}
                 />
@@ -458,6 +458,10 @@
         const state = store.getState()
         const dispatch = store.dispatch
 
+        const time = state.clock.time
+        const coins = state.crypto.coins
+
+
         const favorite = (id) => {
           api.post(`/coins/${id}/favorite`).then(() => {
             dispatch(favoriteCoin(id))
@@ -473,7 +477,12 @@
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
-            <App state={state} favorite={favorite} unfavorite={unfavorite} />,
+            <App
+              time={time}
+              coins={coins}
+              favorite={favorite}
+              unfavorite={unfavorite}
+            />,
             document.getElementById('root')
         )
     }
