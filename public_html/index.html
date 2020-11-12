@@ -456,16 +456,17 @@
     function renderView(store) {
 
         const state = store.getState()
+        const dispatch = store.dispatch
 
         const favorite = (id) => {
           api.post(`/coins/${id}/favorite`).then(() => {
-            store.dispatch(favoriteCoin(id))
+            dispatch(favoriteCoin(id))
           })
         }
 
         const unfavorite = (id) => {
           api.post(`/coins/${id}/unfavorite`).then(() => {
-            store.dispatch(unfavoriteCoin(id))
+            dispatch(unfavoriteCoin(id))
           })
         }
 
