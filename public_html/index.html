@@ -290,7 +290,11 @@
 
     //=======================
 
-    function App ({ store }) {
+    const StoreContext = React.createContext()
+
+    //=======================
+
+    function App () {
         // return VDom.createElement('div', { className: 'app' },
         //     VDom.createElement(Header),
         //     VDom.createElement(Clock, { time: state.time }),
@@ -322,9 +326,9 @@
 
         return (
             <div className="app">
-                <Header />
-              <ClockConnected store={store} />
-              <CoinsConnected store={store} />
+              <Header />
+              <ClockConnected />
+              <CoinsConnected />
             </div>
         )
 
@@ -352,11 +356,17 @@
         return <img className="logo" src="logo.png" alt="" />
     }
 
-    function ClockConnected ({ store }) {
-      const state = store.getState()
-      const time = state.clock.time
+    function ClockConnected () {
+      return (
+        <StoreContext.Consumer>
+          {(store) => {
+            const state = store.getState()
+            const time = state.clock.time
 
-      return <Clock time={time} />
+            return <Clock time={time} />
+          }}
+        </StoreContext.Consumer>
+      );
     }
 
     function Clock({time}) {
@@ -386,14 +396,20 @@
         return <div className="loading">Loading...</div>
     }
 
-    function CoinsConnected ({ store }) {
-      const state = store.getState()
-      const coins = state.crypto.coins
+    function CoinsConnected () {
+      return (
+        <StoreContext.Consumer>
+          {(store) => {
+            const state = store.getState()
+            const coins = state.crypto.coins
 
-      return <Coins coins={coins} store={store} />
+            return <Coins coins={coins}/>
+          }}
+        </StoreContext.Consumer>
+      )
     }
 
-    function Coins({coins, store }) {
+    function Coins({coins }) {
         if (coins === null) {
             //return VDom.createElement(Loading)
             // return React.createElement(Loading)
@@ -413,29 +429,39 @@
                 {coins.map((coin) =>
                   <CoinConnected
                     coin={coin}
-                    store={store}
                     key={coin.id}
                   />)}
             </div>
         )
     }
 
-    function CoinConnected ({ coin, store }) {
-      const dispatch = store.dispatch
+    function CoinConnected ({ coin }) {
 
-      const favorite = (id) => {
-        api.post(`/coins/${id}/favorite`).then(() => {
-          dispatch(favoriteCoin(id))
-        })
-      }
+      return(
+        <StoreContext.Consumer>
+          {(store) => {
+            const dispatch = store.dispatch
 
-      const unfavorite = (id) => {
-        api.post(`/coins/${id}/unfavorite`).then(() => {
-          dispatch(unfavoriteCoin(id))
-        })
-      }
+            const favorite = (id) => {
+              api.post(`/coins/${id}/favorite`).then(() => {
+                dispatch(favoriteCoin(id))
+              })
+            }
 
-      return <Coin coin={coin} favorite={favorite} unfavorite={unfavorite} />
+            const unfavorite = (id) => {
+              api.post(`/coins/${id}/unfavorite`).then(() => {
+                dispatch(unfavoriteCoin(id))
+              })
+            }
+
+            return <Coin
+              coin={coin}
+              favorite={favorite}
+              unfavorite={unfavorite}
+            />
+          }}
+        </StoreContext.Consumer>
+      );
     }
 
     function Coin({coin, favorite, unfavorite}) {
@@ -510,7 +536,9 @@
         ReactDOM.render(
             // VDom.createElement(App, { state }),
             // React.createElement(App, { state }),
-            <App store={store}/>,
+            <StoreContext.Provider value={store}>
+              <App />
+            </StoreContext.Provider>,
             document.getElementById('root')
         )
     }
