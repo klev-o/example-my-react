@@ -302,33 +302,29 @@
         //     React.createElement(Clock, { time: state.time }),
         //     React.createElement(Coins, { coins: state.coins })
         // )
-        const state = store.getState()
-        const dispatch = store.dispatch
-
-        const time = state.clock.time
-        const coins = state.crypto.coins
-
-        const favorite = (id) => {
-          api.post(`/coins/${id}/favorite`).then(() => {
-            dispatch(favoriteCoin(id))
-          })
-        }
-
-        const unfavorite = (id) => {
-          api.post(`/coins/${id}/unfavorite`).then(() => {
-            dispatch(unfavoriteCoin(id))
-          })
-        }
+        // const state = store.getState()
+        // const dispatch = store.dispatch
+        //
+        // const time = state.clock.time
+        // const coins = state.crypto.coins
+        //
+        // const favorite = (id) => {
+        //   api.post(`/coins/${id}/favorite`).then(() => {
+        //     dispatch(favoriteCoin(id))
+        //   })
+        // }
+        //
+        // const unfavorite = (id) => {
+        //   api.post(`/coins/${id}/unfavorite`).then(() => {
+        //     dispatch(unfavoriteCoin(id))
+        //   })
+        // }
 
         return (
             <div className="app">
                 <Header />
-                <Clock time={time} />
-                <Coins
-                  coins={coins}
-                  favorite={favorite}
-                  unfavorite={unfavorite}
-                />
+              <ClockConnected store={store} />
+              <CoinsConnected store={store} />
             </div>
         )
 
@@ -354,6 +350,13 @@
         // return VDom.createElement('img', { className: 'logo', src: 'logo.png' })
         // return React.createElement('img', { className: 'logo', src: 'logo.png' })
         return <img className="logo" src="logo.png" alt="" />
+    }
+
+    function ClockConnected ({ store }) {
+      const state = store.getState()
+      const time = state.clock.time
+
+      return <Clock time={time} />
     }
 
     function Clock({time}) {
@@ -383,7 +386,14 @@
         return <div className="loading">Loading...</div>
     }
 
-    function Coins({coins, favorite, unfavorite }) {
+    function CoinsConnected ({ store }) {
+      const state = store.getState()
+      const coins = state.crypto.coins
+
+      return <Coins coins={coins} store={store} />
+    }
+
+    function Coins({coins, store }) {
         if (coins === null) {
             //return VDom.createElement(Loading)
             // return React.createElement(Loading)
@@ -401,14 +411,31 @@
         return (
             <div className="coins">
                 {coins.map((coin) =>
-                  <Coin
+                  <CoinConnected
                     coin={coin}
+                    store={store}
                     key={coin.id}
-                    favorite={favorite}
-                    unfavorite={unfavorite}
                   />)}
             </div>
         )
+    }
+
+    function CoinConnected ({ coin, store }) {
+      const dispatch = store.dispatch
+
+      const favorite = (id) => {
+        api.post(`/coins/${id}/favorite`).then(() => {
+          dispatch(favoriteCoin(id))
+        })
+      }
+
+      const unfavorite = (id) => {
+        api.post(`/coins/${id}/unfavorite`).then(() => {
+          dispatch(unfavoriteCoin(id))
+        })
+      }
+
+      return <Coin coin={coin} favorite={favorite} unfavorite={unfavorite} />
     }
 
     function Coin({coin, favorite, unfavorite}) {
