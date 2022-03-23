@@ -241,9 +241,10 @@
         <StoreContext.Consumer>
           {(store) => {
             const state = store.getState()
-            const time = state.clock.time
-
-            return <Clock time={time} />
+            const stateToProps = {
+              time: state.clock.time
+            }
+            return <Clock {...stateToProps} />
           }}
         </StoreContext.Consumer>
       );
@@ -268,9 +269,10 @@
         <StoreContext.Consumer>
           {(store) => {
             const state = store.getState()
-            const coins = state.crypto.coins
-
-            return <Coins coins={coins}/>
+            const stateToProps = {
+              coins: state.crypto.coins
+            }
+            return <Coins {...stateToProps}/>
           }}
         </StoreContext.Consumer>
       )
@@ -292,30 +294,28 @@
         )
     }
 
-    function CoinConnected ({ coin }) {
+    function CoinConnected (props) {
 
       return(
         <StoreContext.Consumer>
           {(store) => {
             const dispatch = store.dispatch
 
-            const favorite = (id) => {
-              api.post(`/coins/${id}/favorite`).then(() => {
-                dispatch(favoriteCoin(id))
-              })
+            const dispatchToProps = {
+              favorite: (id) => {
+                api.post(`/coins/${id}/favorite`).then(() => {
+                  dispatch(favoriteCoin(id))
+                })
+              },
+              unfavorite: (id) => {
+                api.post(`/coins/${id}/unfavorite`).then(() => {
+                  dispatch(unfavoriteCoin(id))
+                })
+              }
             }
 
-            const unfavorite = (id) => {
-              api.post(`/coins/${id}/unfavorite`).then(() => {
-                dispatch(unfavoriteCoin(id))
-              })
-            }
+            return <Coin {...props} {...dispatchToProps}/>
 
-            return <Coin
-              coin={coin}
-              favorite={favorite}
-              unfavorite={unfavorite}
-            />
           }}
         </StoreContext.Consumer>
       );
