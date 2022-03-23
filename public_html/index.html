@@ -214,6 +214,28 @@
 
     //=======================
 
+    function connect (mapStateToProps, mapDispatchToProps, WrappedComponent) {
+      return (props) => {
+        return (
+          <StoreContext.Consumer>
+            {(store) => {
+              const stateToProps = mapStateToProps ? mapStateToProps(store.getState()) : {}
+              const dispatchToProps = mapDispatchToProps ? mapDispatchToProps(store.dispatch) : {}
+              return (
+                <WrappedComponent
+                  {...props}
+                  {...stateToProps}
+                  {...dispatchToProps}
+                />
+              )
+            }}
+          </StoreContext.Consumer>
+        )
+      }
+    }
+
+    //=======================
+
     function App () {
         return (
             <div className="app">
@@ -236,20 +258,6 @@
         return <img className="logo" src="logo.png" alt="" />
     }
 
-    function ClockConnected () {
-      return (
-        <StoreContext.Consumer>
-          {(store) => {
-            const state = store.getState()
-            const stateToProps = {
-              time: state.clock.time
-            }
-            return <Clock {...stateToProps} />
-          }}
-        </StoreContext.Consumer>
-      );
-    }
-
     function Clock({time}) {
         const isDay = time.getHours() >= 7 && time.getHours() <= 21
         return (
@@ -259,23 +267,13 @@
             </div>
         )
     }
+    const clockMapStateToProps = (state) => ({
+      time: state.clock.time
+    })
+    const ClockConnected = connect(clockMapStateToProps, null, Clock)
 
     function Loading() {
         return <div className="loading">Loading...</div>
-    }
-
-    function CoinsConnected () {
-      return (
-        <StoreContext.Consumer>
-          {(store) => {
-            const state = store.getState()
-            const stateToProps = {
-              coins: state.crypto.coins
-            }
-            return <Coins {...stateToProps}/>
-          }}
-        </StoreContext.Consumer>
-      )
     }
 
     function Coins({coins }) {
@@ -293,33 +291,10 @@
             </div>
         )
     }
-
-    function CoinConnected (props) {
-
-      return(
-        <StoreContext.Consumer>
-          {(store) => {
-            const dispatch = store.dispatch
-
-            const dispatchToProps = {
-              favorite: (id) => {
-                api.post(`/coins/${id}/favorite`).then(() => {
-                  dispatch(favoriteCoin(id))
-                })
-              },
-              unfavorite: (id) => {
-                api.post(`/coins/${id}/unfavorite`).then(() => {
-                  dispatch(unfavoriteCoin(id))
-                })
-              }
-            }
-
-            return <Coin {...props} {...dispatchToProps}/>
-
-          }}
-        </StoreContext.Consumer>
-      );
-    }
+    const coinsMapStateToProps = (state) => ({
+      coins: state.crypto.coins
+    })
+    const CoinsConnected = connect(coinsMapStateToProps, null, Coins)
 
     function Coin({coin, favorite, unfavorite}) {
         return (
@@ -337,6 +312,19 @@
             </div>
         )
     }
+    const coinMapDispatchToProps = (dispatch) => ({
+      favorite: (id) => {
+        api.post(`/coins/${id}/favorite`).then(() => {
+          dispatch(favoriteCoin(id))
+        })
+      },
+      unfavorite: (id) => {
+        api.post(`/coins/${id}/unfavorite`).then(() => {
+          dispatch(unfavoriteCoin(id))
+        })
+      }
+    })
+    const CoinConnected = connect(null, coinMapDispatchToProps, Coin)
 
     function Favorite ({ active, favorite, unfavorite }) {
       return active ? (
