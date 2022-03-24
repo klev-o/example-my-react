@@ -197,7 +197,7 @@
     }
 
     function favoriteCoinAsync (id) {
-      return (dispatch) => {
+      return (dispatch, getState, { api }) => {
         return api.post(`/coins/${id}/favorite`).then(() => {
           dispatch(favoriteCoin(id))
         })
@@ -212,7 +212,7 @@
     }
 
     function unfavoriteCoinAsync (id) {
-      return (dispatch) => {
+      return (dispatch, getState, { api }) => {
         return api.post(`/coins/${id}/unfavorite`).then(() => {
           dispatch(unfavoriteCoin(id))
         })
@@ -226,7 +226,7 @@
         clock: clockReducer,
         crypto: cryptoReducer
       }),
-      Redux.applyMiddleware(ReduxThunk)
+      Redux.applyMiddleware(ReduxThunk.withExtraArgument({ api }))
     )
 
     //=======================
