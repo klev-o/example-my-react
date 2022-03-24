@@ -204,10 +204,24 @@
 
     //=======================
 
-    const store = Redux.createStore(Redux.combineReducers({
-      clock: clockReducer,
-      crypto: cryptoReducer
-    }))
+    function functionalActionSupport ({ dispatch, getState }) {
+      return function (next) {
+        return function (action) {
+          if (typeof action === 'function') {
+            return action(dispatch, getState)
+          }
+          return next(action);
+        }
+      }
+    }
+
+    const store = Redux.createStore(
+      Redux.combineReducers({
+        clock: clockReducer,
+        crypto: cryptoReducer
+      }),
+      Redux.applyMiddleware(functionalActionSupport)
+    )
 
     //=======================
 
@@ -287,18 +301,22 @@
             </div>
         )
     }
-    const coinMapDispatchToProps = (dispatch) => ({
+    const coinMapDispatchToProps = {
       favorite: (id) => {
-        api.post(`/coins/${id}/favorite`).then(() => {
-          dispatch(favoriteCoin(id))
-        })
+        return (dispatch) => {
+          api.post(`/coins/${id}/favorite`).then(() => {
+            dispatch(favoriteCoin(id))
+          })
+        }
       },
       unfavorite: (id) => {
-        api.post(`/coins/${id}/unfavorite`).then(() => {
-          dispatch(unfavoriteCoin(id))
-        })
+        return (dispatch) => {
+          api.post(`/coins/${id}/unfavorite`).then(() => {
+            dispatch(unfavoriteCoin(id))
+          })
+        }
       }
-    })
+    }
     const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
     function Favorite ({ active, favorite, unfavorite }) {
