@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.js" crossorigin></script>
     <script src="https://unpkg.com/redux@4/dist/redux.js" crossorigin></script>
     <script src="https://unpkg.com/react-redux@7/dist/react-redux.js" crossorigin></script>
+    <script src="https://unpkg.com/redux-thunk@2/dist/redux-thunk.js" crossorigin></script>
     <script src="https://unpkg.com/ionicons@5/dist/ionicons/ionicons.esm.js" type="module" crossorigin></script>
     <script src="https://unpkg.com/mocha@8/mocha.js"></script>
     <script src="https://unpkg.com/chai@2/chai.js"></script>
@@ -220,23 +221,12 @@
 
     //=======================
 
-    function functionalActionSupport ({ dispatch, getState }) {
-      return function (next) {
-        return function (action) {
-          if (typeof action === 'function') {
-            return action(dispatch, getState)
-          }
-          return next(action);
-        }
-      }
-    }
-
     const store = Redux.createStore(
       Redux.combineReducers({
         clock: clockReducer,
         crypto: cryptoReducer
       }),
-      Redux.applyMiddleware(functionalActionSupport)
+      Redux.applyMiddleware(ReduxThunk)
     )
 
     //=======================
