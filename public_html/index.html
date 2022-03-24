@@ -195,10 +195,26 @@
       }
     }
 
+    function favoriteCoinAsync (id) {
+      return (dispatch) => {
+        return api.post(`/coins/${id}/favorite`).then(() => {
+          dispatch(favoriteCoin(id))
+        })
+      }
+    }
+
     function unfavoriteCoin (id) {
       return {
         type: UNFAVORITE_COIN,
         id
+      }
+    }
+
+    function unfavoriteCoinAsync (id) {
+      return (dispatch) => {
+        return api.post(`/coins/${id}/unfavorite`).then(() => {
+          dispatch(unfavoriteCoin(id))
+        })
       }
     }
 
@@ -302,20 +318,8 @@
         )
     }
     const coinMapDispatchToProps = {
-      favorite: (id) => {
-        return (dispatch) => {
-          api.post(`/coins/${id}/favorite`).then(() => {
-            dispatch(favoriteCoin(id))
-          })
-        }
-      },
-      unfavorite: (id) => {
-        return (dispatch) => {
-          api.post(`/coins/${id}/unfavorite`).then(() => {
-            dispatch(unfavoriteCoin(id))
-          })
-        }
-      }
+      favorite: favoriteCoinAsync,
+      unfavorite: unfavoriteCoinAsync
     }
     const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
