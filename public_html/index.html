@@ -155,11 +155,27 @@
       }
     }
 
+    function loadCoinsAsync () {
+      return (dispatch, getState, { api }) => {
+        api.get('/coins').then((coins) => {
+          dispatch(setCoins(coins))
+        })
+      }
+    }
+
     function changeCoinPrice (id, price) {
       return {
         type: CHANGE_COIN_PRICE,
         id,
         price
+      }
+    }
+
+    function subscribeToCoinPrice (id) {
+      return (dispatch, getState, { stream }) => {
+        return stream.subscribe(`price-${id}`, (data) => {
+          dispatch(changeCoinPrice(data.id, data.price))
+        })
       }
     }
 
@@ -280,13 +296,7 @@
       loaded: state.crypto.coins !== null
     })
     const coinsMapDispatchToProps = {
-      load: () => {
-        return (dispatch, getState, {api}) => {
-          api.get('/coins').then((coins) => {
-            dispatch(setCoins(coins))
-          })
-        }
-      }
+      load: loadCoinsAsync
     }
     const CoinsConnected = ReactRedux.connect(coinsMapStateToProps, coinsMapDispatchToProps)(Coins)
 
@@ -313,13 +323,7 @@
     const coinMapDispatchToProps = {
       favorite: favoriteCoinAsync,
       unfavorite: unfavoriteCoinAsync,
-      subscribe: (id) => {
-        return (dispatch, getState, { stream }) => {
-          return stream.subscribe(`price-${id}`, (data) => {
-            dispatch(changeCoinPrice(data.id, data.price))
-          })
-        }
-      }
+      subscribe: subscribeToCoinPrice
     }
     const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
