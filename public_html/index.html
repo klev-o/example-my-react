@@ -75,12 +75,13 @@
         subscribe(channel, listener) {
             const match = /price-(\d+)/.exec(channel)
             if (match) {
-                setInterval(() => {
+                const interval = setInterval(() => {
                     listener({
                         id: parseInt(match[1]),
                         price: Math.round((Math.random() * 10 + 40))
                     })
                 }, 500)
+                return () => clearInterval(interval)
             }
         }
     }
@@ -291,7 +292,7 @@
 
     function Coin({coin, subscribe, favorite, unfavorite}) {
         React.useEffect(() => {
-          subscribe(coin.id)
+          return subscribe(coin.id)
         }, [coin.id])
 
         return (
@@ -314,7 +315,7 @@
       unfavorite: unfavoriteCoinAsync,
       subscribe: (id) => {
         return (dispatch, getState, { stream }) => {
-          stream.subscribe(`price-${id}`, (data) => {
+          return stream.subscribe(`price-${id}`, (data) => {
             dispatch(changeCoinPrice(data.id, data.price))
           })
         }
