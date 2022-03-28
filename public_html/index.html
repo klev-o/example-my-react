@@ -280,22 +280,20 @@
     })
     const coinsMapDispatchToProps = {
       load: () => {
-        return (dispatch, getState, { api, stream }) => {
+        return (dispatch, getState, {api}) => {
           api.get('/coins').then((coins) => {
             dispatch(setCoins(coins))
-
-            coins.forEach((coin) => {
-              stream.subscribe(`price-${coin.id}`, (data) => {
-                dispatch(changeCoinPrice(data.id, data.price))
-              })
-            })
           })
         }
       }
     }
     const CoinsConnected = ReactRedux.connect(coinsMapStateToProps, coinsMapDispatchToProps)(Coins)
 
-    function Coin({coin, favorite, unfavorite}) {
+    function Coin({coin, subscribe, favorite, unfavorite}) {
+        React.useEffect(() => {
+          subscribe(coin.id)
+        }, [coin.id])
+
         return (
             <div className={'coin' + (coin.favorite ? ' favorite' : '')}>
                 <h2>{coin.name}</h2>
@@ -313,7 +311,14 @@
     }
     const coinMapDispatchToProps = {
       favorite: favoriteCoinAsync,
-      unfavorite: unfavoriteCoinAsync
+      unfavorite: unfavoriteCoinAsync,
+      subscribe: (id) => {
+        return (dispatch, getState, { stream }) => {
+          stream.subscribe(`price-${id}`, (data) => {
+            dispatch(changeCoinPrice(data.id, data.price))
+          })
+        }
+      }
     }
     const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
