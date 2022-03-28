@@ -198,7 +198,7 @@
       Redux.combineReducers({
         crypto: cryptoReducer
       }),
-      Redux.applyMiddleware(ReduxThunk.withExtraArgument({ api }))
+      Redux.applyMiddleware(ReduxThunk.withExtraArgument({ api, stream }))
     )
 
     //=======================
@@ -253,7 +253,13 @@
         return <div className="loading">Loading...</div>
     }
 
-    function Coins({coins }) {
+    function Coins({ coins, load }) {
+        React.useEffect(() => {
+          if (coins === null) {
+            load()
+          }
+        }, [coins])
+
         if (coins === null) {
             return <Loading />
         }
@@ -271,7 +277,22 @@
     const coinsMapStateToProps = (state) => ({
       coins: state.crypto.coins
     })
-    const CoinsConnected = ReactRedux.connect(coinsMapStateToProps)(Coins)
+    const coinsMapDispatchToProps = {
+      load: () => {
+        return (dispatch, getState, { api, stream }) => {
+          api.get('/coins').then((coins) => {
+            dispatch(setCoins(coins))
+
+            coins.forEach((coin) => {
+              stream.subscribe(`price-${coin.id}`, (data) => {
+                dispatch(changeCoinPrice(data.id, data.price))
+              })
+            })
+          })
+        }
+      }
+    }
+    const CoinsConnected = ReactRedux.connect(coinsMapStateToProps, coinsMapDispatchToProps)(Coins)
 
     function Coin({coin, favorite, unfavorite}) {
         return (
@@ -315,17 +336,6 @@
       </ReactRedux.Provider>,
       document.getElementById('root')
     )
-
-    //=======================
-
-    api.get('/coins').then((coins) => {
-        store.dispatch(setCoins(coins))
-        coins.forEach((coin) => {
-            stream.subscribe(`price-${coin.id}`, (data) => {
-              store.dispatch(changeCoinPrice(data.id, data.price))
-            })
-        })
-    })
 
     //=======================
 
