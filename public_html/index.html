@@ -254,13 +254,15 @@
     }
 
     function Coins({ coins, load }) {
+        const loaded = coins !== null
+
         React.useEffect(() => {
-          if (coins === null) {
+          if (!loaded) {
             load()
           }
-        }, [coins])
+        }, [loaded])
 
-        if (coins === null) {
+        if (!loaded) {
             return <Loading />
         }
 
