@@ -225,7 +225,7 @@
             <div className="app">
               <Header />
               <ClockContainer />
-              <CoinsConnected />
+              <CoinsContainerConnected />
             </div>
         )
     }
@@ -270,7 +270,7 @@
         return <div className="loading">Loading...</div>
     }
 
-    function Coins({ coins, loaded, load }) {
+    function CoinsContainer({ coins, loaded, load }) {
         React.useEffect(() => {
           if (!loaded) {
             load()
@@ -280,31 +280,40 @@
         if (!loaded) {
             return <Loading />
         }
-
-        return (
-            <div className="coins">
-                {coins.map((coin) =>
-                  <CoinConnected
-                    coin={coin}
-                    key={coin.id}
-                  />)}
-            </div>
-        )
+      return <Coins coins={coins} />
     }
-    const coinsMapStateToProps = (state) => ({
+    function Coins ({ coins }) {
+      return (
+        <div className="coins">
+          {coins.map((coin) => <CoinContainerConnected coin={coin} key={coin.id} />)}
+        </div>
+      )
+    }
+    const coinsContainerMapStateToProps = (state) => ({
       coins: state.crypto.coins,
       loaded: state.crypto.coins !== null
     })
-    const coinsMapDispatchToProps = {
+    const coinsContainerMapDispatchToProps = {
       load: loadCoinsAsync
     }
-    const CoinsConnected = ReactRedux.connect(coinsMapStateToProps, coinsMapDispatchToProps)(Coins)
+    const CoinsContainerConnected = ReactRedux.connect(
+      coinsContainerMapStateToProps,
+      coinsContainerMapDispatchToProps
+    )(CoinsContainer)
 
-    function Coin({coin, subscribe, favorite, unfavorite}) {
-        React.useEffect(() => {
-          return subscribe(coin.id)
-        }, [coin.id])
+    function CoinContainer ({ coin, subscribe }) {
+      React.useEffect(() => {
+        return subscribe(coin.id)
+      }, [coin.id])
 
+      return <CoinConnected coin={coin}/>
+    }
+    const coinContainerMapDispatchToProps = {
+      subscribe: subscribeToCoinPrice
+    }
+    const CoinContainerConnected = ReactRedux.connect(null, coinContainerMapDispatchToProps)(CoinContainer)
+
+    function Coin ({ coin, favorite, unfavorite }) {
         return (
             <div className={'coin' + (coin.favorite ? ' favorite' : '')}>
                 <h2>{coin.name}</h2>
@@ -322,8 +331,7 @@
     }
     const coinMapDispatchToProps = {
       favorite: favoriteCoinAsync,
-      unfavorite: unfavoriteCoinAsync,
-      subscribe: subscribeToCoinPrice
+      unfavorite: unfavoriteCoinAsync
     }
     const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
