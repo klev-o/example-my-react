@@ -28,24 +28,28 @@
         get(url) {
             switch (url) {
                 case '/coins':
-                    return new Promise((resolve) => {
+                    return new Promise((resolve, reject) => {
                         setTimeout(() => {
-                            resolve([
-                                {
-                                    id: 1,
-                                    name: 'Super Coin',
-                                    description: 'Super coin for you',
-                                    price: 256,
-                                    favorite: true,
-                                },
-                                {
-                                    id: 2,
-                                    name: 'Awesome Coin AWM',
-                                    description: 'Cosmic coin. Available in ru zone',
-                                    price: 1025,
-                                    favorite: false,
-                                },
-                            ])
+                          if (Math.random() > 0.25) {
+                              resolve([
+                                  {
+                                      id: 1,
+                                      name: 'Super Coin',
+                                      description: 'Super coin for you',
+                                      price: 256,
+                                      favorite: true,
+                                  },
+                                  {
+                                      id: 2,
+                                      name: 'Awesome Coin AWM',
+                                      description: 'Cosmic coin. Available in ru zone',
+                                      price: 1025,
+                                      favorite: false,
+                                  },
+                              ])
+                          } else {
+                              reject(new Error('Connection error'))
+                          }
                         }, 1000)
                     })
                 default:
@@ -89,20 +93,44 @@
     //=======================
 
     const cryptoInitialState = {
-      coins: null
+      coins: [],
+      loading: false,
+      loaded: false,
+      error: null
     }
 
-    const SET_COINS = 'SET_COINS'
+    const COINS_LOADING_PENDING = 'COINS_LOADING_PENDING'
+    const COINS_LOADING_SUCCESS = 'COINS_LOADING_SUCCESS'
+    const COINS_LOADING_ERROR = 'COINS_LOADING_ERROR'
     const CHANGE_COIN_PRICE = 'CHANGE_COIN_PRICE'
     const FAVORITE_COIN = 'FAVORITE_COIN'
     const UNFAVORITE_COIN = 'UNFAVORITE_COIN'
 
     function cryptoReducer  (state = cryptoInitialState, action) {
       switch (action.type) {
-        case SET_COINS:
+        case COINS_LOADING_PENDING:
           return {
             ...state,
-            coins: action.coins
+            coins: [],
+            loading: true,
+            loaded: false,
+            error: null
+          }
+        case COINS_LOADING_SUCCESS:
+          return {
+            ...state,
+            coins: crypto.coins,
+            loading: false,
+            loaded: true,
+            error: null
+          }
+        case COINS_LOADING_ERROR:
+          return {
+            ...state,
+            coins: [],
+            loading: false,
+            loaded: false,
+            error: crypto.error
           }
         case CHANGE_COIN_PRICE:
           return {
@@ -148,18 +176,32 @@
       }
     }
 
-    function setCoins (coins) {
+    function coinsLoadingPending () {
       return {
-        type: SET_COINS,
+        type: COINS_LOADING_PENDING
+      }
+    }
+
+    function coinsLoadingSuccess (coins) {
+      return {
+        type: COINS_LOADING_SUCCESS,
         coins
+      }
+    }
+
+    function coinsLoadingError (error) {
+      return {
+        type: COINS_LOADING_ERROR,
+        error
       }
     }
 
     function loadCoinsAsync () {
       return (dispatch, getState, { api }) => {
-        api.get('/coins').then((coins) => {
-          dispatch(setCoins(coins))
-        })
+        dispatch(coinsLoadingPending())
+        api.get('/coins')
+          .then((coins) => dispatch(coinsLoadingSuccess(coins)))
+          .catch((error) => dispatch(coinsLoadingError(error.message)))
       }
     }
 
@@ -270,17 +312,32 @@
         return <div className="loading">Loading...</div>
     }
 
-    function CoinsContainer({ coins, loaded, load }) {
+    function AlertError ({ message }) {
+      return <div className="error">{message}</div>
+    }
+
+    function CoinsContainer ({ coins, loading, loaded, error, load }) {
         React.useEffect(() => {
-          if (!loaded) {
+          if (!loaded && !loading && error === null) {
             load()
           }
-        }, [loaded])
+        }, [loaded, loading, error])
 
-        if (!loaded) {
+        if (error !== null) {
+          return <AlertError message={error} />
+        }
+
+        if (loading) {
             return <Loading />
         }
-      return <Coins coins={coins} />
+
+        if (!loaded) {
+          return null
+        }
+
+        console.log('coins', coins)
+
+        return <Coins coins={coins} />
     }
     function Coins ({ coins }) {
       return (
@@ -291,7 +348,9 @@
     }
     const coinsContainerMapStateToProps = (state) => ({
       coins: state.crypto.coins,
-      loaded: state.crypto.coins !== null
+      loading: state.crypto.loading,
+      loaded: state.crypto.loaded,
+      error: state.crypto.error
     })
     const coinsContainerMapDispatchToProps = {
       load: loadCoinsAsync
