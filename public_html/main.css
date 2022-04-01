@@ -88,18 +88,30 @@ body {
     border-radius: 5px;
 }
 
+button:disabled {
+    cursor: wait;
+}
+
+button.favorite:disabled {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #ccc;
+}
+
 .coin button.favorite {
     color: #000;
     border: 1px solid #999;
 }
 
 .coin button.unfavorite {
-
-
     background: #000;
     border: 1px solid #000;
     color: #fff;
+}
 
+button.unfavorite:disabled {
+    border: 1px solid #ffc0ad;
+    color: #ff8c68;
 }
 
 .loading {
