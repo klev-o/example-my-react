@@ -8,9 +8,6 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone@7.12.6/babel.js" crossorigin></script>
-    <script src="https://unpkg.com/redux@4/dist/redux.js" crossorigin></script>
-    <script src="https://unpkg.com/react-redux@7/dist/react-redux.js" crossorigin></script>
-    <script src="https://unpkg.com/redux-thunk@2/dist/redux-thunk.js" crossorigin></script>
     <script src="https://unpkg.com/ionicons@5/dist/ionicons/ionicons.esm.js" type="module" crossorigin></script>
     <script src="https://unpkg.com/mocha@8/mocha.js"></script>
     <script src="https://unpkg.com/chai@2/chai.js"></script>
@@ -92,13 +89,6 @@
 
     //=======================
 
-    const cryptoInitialState = {
-      coins: [],
-      loading: false,
-      loaded: false,
-      error: null
-    }
-
     const COINS_LOADING_PENDING = 'COINS_LOADING_PENDING'
     const COINS_LOADING_SUCCESS = 'COINS_LOADING_SUCCESS'
     const COINS_LOADING_ERROR = 'COINS_LOADING_ERROR'
@@ -106,7 +96,7 @@
     const FAVORITE_COIN = 'FAVORITE_COIN'
     const UNFAVORITE_COIN = 'UNFAVORITE_COIN'
 
-    function cryptoReducer  (state = cryptoInitialState, action) {
+    function coinsReducer (state, action) {
       switch (action.type) {
         case COINS_LOADING_PENDING:
           return {
@@ -119,7 +109,7 @@
         case COINS_LOADING_SUCCESS:
           return {
             ...state,
-            coins: crypto.coins,
+            coins: action.coins,
             loading: false,
             loaded: true,
             error: null
@@ -130,7 +120,7 @@
             coins: [],
             loading: false,
             loaded: false,
-            error: crypto.error
+            error: action.error
           }
         case CHANGE_COIN_PRICE:
           return {
@@ -196,28 +186,11 @@
       }
     }
 
-    function loadCoinsAsync () {
-      return (dispatch, getState, { api }) => {
-        dispatch(coinsLoadingPending())
-        api.get('/coins')
-          .then((coins) => dispatch(coinsLoadingSuccess(coins)))
-          .catch((error) => dispatch(coinsLoadingError(error.message)))
-      }
-    }
-
     function changeCoinPrice (id, price) {
       return {
         type: CHANGE_COIN_PRICE,
         id,
         price
-      }
-    }
-
-    function subscribeToCoinPrice (id) {
-      return (dispatch, getState, { stream }) => {
-        return stream.subscribe(`price-${id}`, (data) => {
-          dispatch(changeCoinPrice(data.id, data.price))
-        })
       }
     }
 
@@ -228,38 +201,13 @@
       }
     }
 
-    function favoriteCoinAsync (id) {
-      return (dispatch, getState, { api }) => {
-        return api.post(`/coins/${id}/favorite`).then(() => {
-          dispatch(favoriteCoin(id))
-        })
-      }
-    }
-
     function unfavoriteCoin (id) {
       return {
         type: UNFAVORITE_COIN,
         id
       }
     }
-
-    function unfavoriteCoinAsync (id) {
-      return (dispatch, getState, { api }) => {
-        return api.post(`/coins/${id}/unfavorite`).then(() => {
-          dispatch(unfavoriteCoin(id))
-        })
-      }
-    }
-
-    //=======================
-
-    const store = Redux.createStore(
-      Redux.combineReducers({
-        crypto: cryptoReducer
-      }),
-      Redux.applyMiddleware(ReduxThunk.withExtraArgument({ api, stream }))
-    )
-
+    
     //=======================
 
     function App () {
@@ -267,7 +215,7 @@
             <div className="app">
               <Header />
               <ClockContainer />
-              <CoinsContainerConnected />
+              <CoinsContainer />
             </div>
         )
     }
@@ -316,10 +264,22 @@
       return <div className="error">{message}</div>
     }
 
-    function CoinsContainer ({ coins, loading, loaded, error, load }) {
+    function CoinsContainer () {
+
+      const [state, dispatch] = React.useReducer(coinsReducer, {
+        coins: [],
+        loading: false,
+        loaded: false,
+        error: null
+      })
+
+      const { coins, loading, loaded, error } = state
         React.useEffect(() => {
           if (!loaded && !loading && error === null) {
-            load()
+            dispatch(coinsLoadingPending())
+            api.get('/coins')
+              .then((coins) => dispatch(coinsLoadingSuccess(coins)))
+              .catch((error) => dispatch(coinsLoadingError(error.message)))
           }
         }, [loaded, loading, error])
 
@@ -335,42 +295,53 @@
           return null
         }
 
-        console.log('coins', coins)
+        const subscribe = (id) => {
+          return stream.subscribe(`price-${id}`, (data) => {
+            dispatch(changeCoinPrice(data.id, data.price))
+          })
+        }
 
-        return <Coins coins={coins} />
+        const favorite = (id) => {
+          return api.post(`/coins/${id}/favorite`).then(() => {
+            dispatch(favoriteCoin(id))
+          })
+        }
+
+        const unfavorite = (id) => {
+          return api.post(`/coins/${id}/unfavorite`).then(() => {
+            dispatch(unfavoriteCoin(id))
+          })
+        }
+
+      return <Coins
+        coins={coins}
+        subscribe={subscribe}
+        favorite={favorite}
+        unfavorite={unfavorite}
+      />
+
     }
-    function Coins ({ coins }) {
+    function Coins ({ coins, subscribe, favorite, unfavorite  }) {
       return (
         <div className="coins">
-          {coins.map((coin) => <CoinContainerConnected coin={coin} key={coin.id} />)}
+          {coins.map((coin) => <CoinContainer
+            coin={coin}
+            subscribe={subscribe}
+            favorite={favorite}
+            unfavorite={unfavorite}
+            key={coin.id}/>)
+          }
         </div>
       )
     }
-    const coinsContainerMapStateToProps = (state) => ({
-      coins: state.crypto.coins,
-      loading: state.crypto.loading,
-      loaded: state.crypto.loaded,
-      error: state.crypto.error
-    })
-    const coinsContainerMapDispatchToProps = {
-      load: loadCoinsAsync
-    }
-    const CoinsContainerConnected = ReactRedux.connect(
-      coinsContainerMapStateToProps,
-      coinsContainerMapDispatchToProps
-    )(CoinsContainer)
 
-    function CoinContainer ({ coin, subscribe }) {
+    function CoinContainer ({ coin, subscribe, favorite, unfavorite }) {
       React.useEffect(() => {
         return subscribe(coin.id)
       }, [coin.id])
 
-      return <CoinConnected coin={coin}/>
+      return <Coin coin={coin} favorite={favorite} unfavorite={unfavorite} />
     }
-    const coinContainerMapDispatchToProps = {
-      subscribe: subscribeToCoinPrice
-    }
-    const CoinContainerConnected = ReactRedux.connect(null, coinContainerMapDispatchToProps)(CoinContainer)
 
     function Coin ({ coin, favorite, unfavorite }) {
         return (
@@ -388,11 +359,6 @@
             </div>
         )
     }
-    const coinMapDispatchToProps = {
-      favorite: favoriteCoinAsync,
-      unfavorite: unfavoriteCoinAsync
-    }
-    const CoinConnected = ReactRedux.connect(null, coinMapDispatchToProps)(Coin)
 
     function Favorite ({ active, favorite, unfavorite }) {
       return active ? (
@@ -409,9 +375,7 @@
     //=======================
 
     ReactDOM.render(
-      <ReactRedux.Provider store={store}>
-        <App />
-      </ReactRedux.Provider>,
+      <App />,
       document.getElementById('root')
     )
 
