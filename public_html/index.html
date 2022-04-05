@@ -289,11 +289,23 @@
       </RouterContext.Consumer>
     }
 
+    function matchPath (location, path) {
+      const regexp = new RegExp('^' + path + '$')
+      return regexp.exec(location)
+    }
+
     function Route ({ path, children }) {
       return <RouterContext.Consumer>
         {(value) => {
-          if (value.location === path) {
-            return children
+          const match = matchPath(value.location, path)
+          if (match) {
+            return <RouterContext.Provider
+              value={{
+                ...value,
+                match
+              }}
+              children={children}
+            />
           }
           return null
         }}
@@ -347,6 +359,9 @@
           <Route path="/coins">
             <CoinsPage />
           </Route>
+          <Route path="/coins/(?<id>[\w-]+)">
+            <CoinPage />
+          </Route>
           <Route path="/help">
             <HelpPage />
           </Route>
@@ -392,6 +407,16 @@
           <ClockContainer />
           <CoinsContainerConnected />
         </>
+      )
+    }
+
+    function CoinPage () {
+      const router = React.useContext(RouterContext)
+      return (
+        <Page>
+          <h1>Coin #{router.match.groups.id}</h1>
+          <p>Coin description</p>
+        </Page>
       )
     }
 
@@ -491,7 +516,9 @@
     function Coin ({ coin, favorite, unfavorite }) {
         return (
             <div className={'coin' + (coin.favorite ? ' favorite' : '')}>
-                <h2>{coin.name}</h2>
+                <h2>
+                  <Link to={'/coins/' + coin.id}>{coin.name}</Link>
+                </h2>
                 <div className="info">
                     <p>{coin.description}</p>
                     <div className="price">{coin.price}</div>
