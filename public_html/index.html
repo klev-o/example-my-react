@@ -312,6 +312,11 @@
       </RouterContext.Consumer>
     }
 
+    function useParams () {
+      const router = React.useContext(RouterContext)
+      return router.match.groups
+    }
+
     //=======================
 
     function App () {
@@ -411,10 +416,10 @@
     }
 
     function CoinPage () {
-      const router = React.useContext(RouterContext)
+      const params = useParams()
       return (
         <Page>
-          <h1>Coin #{router.match.groups.id}</h1>
+          <h1>Coin #{params.id}</h1>
           <p>Coin description</p>
         </Page>
       )
