@@ -278,7 +278,7 @@
 
     //=======================
 
-    const { BrowserRouter, Switch, Route, Link, useParams } = ReactRouterDOM
+    const { BrowserRouter, Switch, Route, Link, NavLink, useParams } = ReactRouterDOM
 
     //=======================
 
@@ -310,9 +310,9 @@
       return (
         <nav>
           <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/coins">Coins</Link></li>
-            <li><Link to="/help">Help</Link></li>
+            <li><NavLink to="/" exact>Home</NavLink></li>
+            <li><NavLink to="/coins">Coins</NavLink></li>
+            <li><NavLink to="/help" exact>Help</NavLink></li>
           </ul>
         </nav>
       )
