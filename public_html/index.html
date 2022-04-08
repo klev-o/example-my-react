@@ -289,22 +289,26 @@
       </RouterContext.Consumer>
     }
 
-    function matchPath (location, path) {
-      const regexp = new RegExp('^' + path + '$')
+    function matchPath (location, params) {
+      const regexp = new RegExp(
+        params.exact
+          ? '^' + params.path + '$'
+          : '^' + params.path + '(/.*)?$'
+      )
       return regexp.exec(location)
     }
 
-    function Route ({ path, children }) {
+    function Route (props) {
       return <RouterContext.Consumer>
         {(value) => {
-          const match = matchPath(value.location, path)
+          const match = matchPath(value.location, props)
           if (match) {
             return <RouterContext.Provider
               value={{
                 ...value,
                 match
               }}
-              children={children}
+              children={props.children}
             />
           }
           return null
@@ -358,16 +362,16 @@
     function Content () {
       return (
         <>
-          <Route path="/">
+          <Route path="/" exact>
             <HomePage />
           </Route>
-          <Route path="/coins">
+          <Route path="/coins" exact>
             <CoinsPage />
           </Route>
-          <Route path="/coins/(?<id>[\w-]+)">
+          <Route path="/coins/(?<id>[\w-]+)" exact>
             <CoinPage />
           </Route>
-          <Route path="/help">
+          <Route path="/help" exact>
             <HelpPage />
           </Route>
         </>
