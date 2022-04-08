@@ -280,14 +280,30 @@
     const RouterContext = React.createContext()
 
     function Router ({ children }) {
-      const [location, setLocation] = React.useState('/')
+      const [location, setLocation] = React.useState(
+        window.location.hash.slice(1) || '/'
+      )
+
+      React.useEffect(() => {
+        const listener = () => {
+          setLocation(window.location.hash.slice(1) || '/')
+        }
+        window.addEventListener('hashchange', listener, false)
+        return () => {
+          window.removeEventListener('hashchange', listener)
+        }
+      }, [setLocation])
 
       const navigate = (location) => {
-        setLocation(location)
+        window.location.hash = location
+      }
+
+      const createHref = (path) => {
+        return '#' + path
       }
 
       return <RouterContext.Provider
-        value={{ location, navigate }}
+        value={{ location, navigate, createHref }}
         children={children}
       />
     }
@@ -295,11 +311,12 @@
     function Link ({ to, children, ...options }) {
       return <RouterContext.Consumer>
         {(value) => {
+          const href = to ? value.createHref(to) : ''
           const onClick = (event) => {
             event.preventDefault()
             value.navigate(to)
           }
-          return <a href="" onClick={onClick} {...options}>{children}</a>
+          return <a href={href} onClick={onClick} {...options}>{children}</a>
         }}
       </RouterContext.Consumer>
     }
