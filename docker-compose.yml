@@ -4,6 +4,6 @@ services:
     image: nginx:alpine
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./public:/app/public
+      - ./public_html:/app/public
     ports:
       - "8080:80"
