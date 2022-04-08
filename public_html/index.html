@@ -99,6 +99,7 @@
       error: null
     }
 
+    const COINS_CLEAR = 'COINS_CLEAR'
     const COINS_LOADING_PENDING = 'COINS_LOADING_PENDING'
     const COINS_LOADING_SUCCESS = 'COINS_LOADING_SUCCESS'
     const COINS_LOADING_ERROR = 'COINS_LOADING_ERROR'
@@ -108,6 +109,14 @@
 
     function cryptoReducer (state = cryptoInitialState, action) {
       switch (action.type) {
+        case COINS_CLEAR:
+          return {
+            ...state,
+            coins: [],
+            loading: false,
+            loaded: false,
+            error: null
+          }
         case COINS_LOADING_PENDING:
           return {
             ...state,
@@ -173,6 +182,12 @@
           }
         default:
           return state
+      }
+    }
+
+    function coinsClear () {
+      return {
+        type: COINS_CLEAR
       }
     }
 
@@ -493,12 +508,18 @@
       )
     }
 
-    function CoinsContainer ({ coins, loading, loaded, error, load }) {
+    function CoinsContainer ({ coins, loading, loaded, error, load, unload }) {
         React.useEffect(() => {
           if (!loaded && !loading && error === null) {
             load()
           }
         }, [loaded, loading, error])
+
+        React.useEffect(() => {
+          if (loaded || error !== null) {
+            return unload
+          }
+        }, [loaded, error])
 
         if (error !== null) {
           return <AlertError message={error} retry={load} />
@@ -524,7 +545,8 @@
     })
 
     const coinsContainerMapDispatchToProps = {
-      load: loadCoinsAsync
+      load: loadCoinsAsync,
+      unload: coinsClear
     }
 
     const CoinsContainerConnected = ReactRedux.connect(
